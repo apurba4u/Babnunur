@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { Request, Response, NextFunction } from 'express';
-import { auth } from '../config/auth';
 import { UnauthorizedError } from '../core/errors';
 import { RequestUser } from '../core/types';
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquareText, FileText, Sparkles, LayoutDashboard, Settings, Package } from 'lucide-react';
+import { MessageSquareText, FileText, Sparkles, LayoutDashboard, Settings, Package, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'Items', href: '/items', icon: Package },
   { name: 'Chat', href: '/chat', icon: MessageSquareText },
   { name: 'Documents', href: '/documents', icon: FileText },
+  { name: 'Workspace', href: '/workspace', icon: Layers },
   { name: 'Recommendations', href: '/recommendations', icon: Sparkles },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];

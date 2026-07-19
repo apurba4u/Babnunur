@@ -9,6 +9,8 @@ import { notFound } from './middleware/notFound';
 import authRoutes from './features/auth/routes/auth.routes';
 import itemRoutes from './features/items/routes/item.routes';
 import dashboardRoutes from './features/dashboard/routes/dashboard.routes';
+import chatRoutes from './features/chat/routes/chat.routes';
+import conversationRoutes from './features/chat/routes/conversation.routes';
 
 const app = express();
 
@@ -32,6 +34,8 @@ app.get('/health', (_req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/items', itemRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/conversations', conversationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

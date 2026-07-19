@@ -33,3 +33,22 @@ export interface RAGChatResponse {
   citations: Citation[];
   tokenUsage: { input: number; output: number; total: number };
 }
+
+export interface HybridSearchParams {
+  query: string;
+  userId: string;
+  topK?: number;
+  alpha?: number;
+  documentIds?: string[];
+}
+
+export interface RankedChunk {
+  chunkId: string;
+  documentId: string;
+  content: string;
+  denseScore: number;
+  sparseScore: number;
+  combinedScore: number;
+  pageNumber?: number;
+  citation: string;
+}

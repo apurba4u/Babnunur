@@ -37,7 +37,7 @@ export class AnalyticsService {
       AnalyticsEvent.aggregate([{ $match: { userId } }, { $group: { _id: null, total: { $sum: '$tokens' } } }]),
       AnalyticsEvent.findOne({ userId }).sort({ createdAt: -1 }),
     ]);
-    return { requestCount: eventCount, tokenUsage: tokenTotal[0]?.total || 0, lastActive: lastEvent?.createdAt };
+    return { requestCount: eventCount, tokenUsage: tokenTotal[0]?.total || 0, lastActive: lastEvent?.createdAt ?? null };
   }
 }
 

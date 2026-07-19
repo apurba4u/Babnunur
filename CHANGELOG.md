@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0] - 2026-07-19
+
+### Added
+- Persistent Conversation Memory
+- Multi-Agent System (6 agents)
+- Advanced RAG (Hybrid Search, BM25)
+- Knowledge Base
+- Workflow Automation
+- Plugin System
+- Team Collaboration
+- Admin Analytics
+- Billing Foundation
+
+### Changed
+- Replaced console.log with console.info for production readiness
+- Updated version to 3.0.0
+
 ## [2.1.0] - 2026-07-19
 
 ### Added

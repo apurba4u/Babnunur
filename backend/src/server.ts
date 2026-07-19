@@ -7,24 +7,24 @@ const startServer = async (): Promise<void> => {
   try {
     // Database
     await connectDatabase();
-    console.log('✓ MongoDB Connected');
+    console.info('✓ MongoDB Connected');
 
     // Better Auth
-    console.log('✓ Better Auth Initialized');
+    console.info('✓ Better Auth Initialized');
 
     // AI Providers
     const providers = ProviderFactory.getAvailableProviders();
     if (providers.length > 0) {
-      console.log(`✓ AI Providers Loaded: ${providers.map(p => p.name).join(', ')}`);
+      console.info(`✓ AI Providers Loaded: ${providers.map(p => p.name).join(', ')}`);
     } else {
-      console.log('⚠ No AI providers configured (missing API keys)');
+      console.warn('⚠ No AI providers configured (missing API keys)');
     }
 
     // Server
     app.listen(config.PORT, () => {
-      console.log(`✓ Server Running on port ${config.PORT}`);
-      console.log(`✓ Environment: ${config.NODE_ENV}`);
-      console.log(`✓ API Base URL: ${config.BETTER_AUTH_URL}/api/v1`);
+      console.info(`✓ Server Running on port ${config.PORT}`);
+      console.info(`✓ Environment: ${config.NODE_ENV}`);
+      console.info(`✓ API Base URL: ${config.BETTER_AUTH_URL}/api/v1`);
     });
   } catch (error) {
     console.error('✗ Failed to start server:', error);

@@ -19,7 +19,7 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
     };
     if (res.statusCode >= 500) console.error(JSON.stringify(log));
     else if (duration > 5000) console.warn(JSON.stringify(log));
-    else console.log(JSON.stringify(log));
+    else console.info(JSON.stringify(log));
   });
 
   next();

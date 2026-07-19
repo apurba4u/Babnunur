@@ -11,13 +11,31 @@ export async function processDocumentFile(
   storagePath: string,
   mimeType: string
 ): Promise<ProcessResult> {
-  const buffer = await fs.readFile(storagePath);
+  let buffer: Buffer;
+  try {
+    buffer = await fs.readFile(storagePath);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(`File not found: ${storagePath}`);
+    }
+    throw new Error(`Failed to read file: ${(err as Error).message}`);
+  }
+
+  if (buffer.length === 0) {
+    throw new Error('File is empty');
+  }
 
   switch (mimeType) {
     case 'application/pdf': {
       const uint8 = new Uint8Array(buffer);
-      const [textResult, metaResult] = await Promise.all([
-        extractText(uint8),
+      let textResult: { text: string | string[]; totalPages?: number };
+      try {
+        textResult = await extractText(uint8);
+      } catch {
+        throw new Error('Failed to parse PDF. The file may be corrupted or encrypted.');
+      }
+
+      const [metaResult] = await Promise.all([
         getMeta(uint8).catch(() => null),
       ]);
 
@@ -39,14 +57,23 @@ export async function processDocumentFile(
       };
     }
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
-      const result = await mammoth.extractRawText({ buffer });
-      return {
-        text: result.value,
-        metadata: {
-          wordCount: result.value.split(/\s+/).length,
-          charCount: result.value.length,
-        },
-      };
+      try {
+        const result = await mammoth.extractRawText({ buffer });
+        const text = result.value;
+        if (!text.trim()) {
+          throw new Error('DOCX file contains no extractable text');
+        }
+        return {
+          text,
+          metadata: {
+            wordCount: text.split(/\s+/).length,
+            charCount: text.length,
+          },
+        };
+      } catch (err) {
+        if ((err as Error).message.includes('contains no extractable text')) throw err;
+        throw new Error(`Failed to parse DOCX: ${(err as Error).message}`);
+      }
     }
     case 'text/plain':
     case 'text/markdown': {

@@ -1,7 +1,14 @@
 import { Item } from '../../items/models/item.model';
 
 export class DashboardService {
-  async getStats(userId: string) {
+  async getStats(userId: string): Promise<{
+    totalItems: number;
+    activeItems: number;
+    archivedItems: number;
+    draftItems: number;
+    categoryStats: { category: string; count: number }[];
+    recentItems: Record<string, unknown>[];
+  }> {
     const [totalItems, activeItems, archivedItems, draftItems, categoryStats] = await Promise.all([
       Item.countDocuments({ userId }),
       Item.countDocuments({ userId, status: 'active' }),

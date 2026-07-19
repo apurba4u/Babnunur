@@ -13,9 +13,9 @@ interface QueryParams {
 }
 
 export class ItemService {
-  async findAll(params: QueryParams) {
+  async findAll(params: QueryParams): Promise<{ data: Record<string, unknown>[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     const { userId, page, limit, search, category, status, sort } = params;
-    const filter: Record<string, any> = { userId };
+    const filter: Record<string, unknown> = { userId };
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },

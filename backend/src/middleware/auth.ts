@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { Request, Response, NextFunction } from 'express';
 import { auth } from '../config/auth';
 import { UnauthorizedError } from '../core/errors';
@@ -25,7 +26,7 @@ export const requireAuth = async (
       id: session.user.id,
       email: session.user.email,
       name: session.user.name,
-      role: (session.user as any).role || 'user',
+      role: (session.user as Record<string, unknown>).role as string || 'user',
     };
     next();
   } catch {

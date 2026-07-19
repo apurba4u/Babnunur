@@ -1,22 +1,13 @@
-/* eslint-disable @typescript-eslint/no-namespace */
 import { Request, Response, NextFunction } from 'express';
+import { auth } from '../config/auth';
 import { UnauthorizedError } from '../core/errors';
 import { RequestUser } from '../core/types';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: RequestUser;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: RequestUser;
   }
 }
-
-// Simple in-memory session store for tokens
-const tokenStore = new Map<string, { userId: string; email: string; name: string }>();
-
-export const setSessionToken = (token: string, user: { userId: string; email: string; name: string }): void => {
-  tokenStore.set(token, user);
-};
 
 export const requireAuth = async (
   req: Request,
@@ -24,23 +15,21 @@ export const requireAuth = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-      throw new UnauthorizedError('No authentication token');
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
 
-    const token = authHeader.substring(7);
-    const session = tokenStore.get(token);
-
-    if (!session) {
-      throw new UnauthorizedError('Invalid or expired token');
+    const session = await auth.api.getSession({ headers });
+    if (!session || !session.user) {
+      throw new UnauthorizedError('Authentication required');
     }
 
     req.user = {
-      id: session.userId,
-      email: session.email,
-      name: session.name,
-      role: 'user',
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      role: (session.user as Record<string, unknown>).role as string || 'user',
     };
     next();
   } catch {

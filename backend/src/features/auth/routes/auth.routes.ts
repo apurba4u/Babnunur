@@ -1,102 +1,112 @@
 import { Router, Request, Response } from 'express';
 import { auth } from '../../../config/auth';
-import { setSessionToken } from '../../../middleware/auth';
 
 const router = Router();
 
-router.post('/sign-up', async (req: Request, res: Response) => {
+router.all('/sign-up', async (req: Request, res: Response) => {
   try {
-    const result = await auth.api.signUpEmail({ body: req.body });
-    if (result.token && result.user) {
-      setSessionToken(result.token, {
-        userId: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-      });
+    const url = new URL(`/api/v1/auth/sign-up`, `http://${req.headers.host || 'localhost'}`);
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
-    res.json({ success: true, data: result });
-  } catch (err) {
-    res.status(400).json({ success: false, error: (err as Error).message });
+    const init: RequestInit = { method: req.method, headers };
+    if (req.method !== 'GET' && req.method !== 'HEAD') init.body = JSON.stringify(req.body);
+    const webResponse = await auth.handler(new globalThis.Request(url.toString(), init));
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
+    res.send(await webResponse.text());
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
   }
 });
 
-router.post('/sign-in', async (req: Request, res: Response) => {
+router.all('/sign-in', async (req: Request, res: Response) => {
   try {
-    const result = await auth.api.signInEmail({ body: req.body });
-    if (result.token && result.user) {
-      setSessionToken(result.token, {
-        userId: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-      });
+    const url = new URL(`/api/v1/auth/sign-in`, `http://${req.headers.host || 'localhost'}`);
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
-    res.json({ success: true, data: result });
-  } catch (err) {
-    res.status(400).json({ success: false, error: (err as Error).message });
+    const init: RequestInit = { method: req.method, headers };
+    if (req.method !== 'GET' && req.method !== 'HEAD') init.body = JSON.stringify(req.body);
+    const webResponse = await auth.handler(new globalThis.Request(url.toString(), init));
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
+    res.send(await webResponse.text());
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
   }
 });
 
-router.post('/sign-out', async (_req: Request, res: Response) => {
-  res.json({ success: true });
-});
-
-router.get('/session', async (req: Request, res: Response) => {
+router.all('/sign-out', async (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-      res.status(401).json({ success: false, error: 'No token' });
-      return;
+    const url = new URL(`/api/v1/auth/sign-out`, `http://${req.headers.host || 'localhost'}`);
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
-    res.json({ success: true, data: { token: authHeader.substring(7) } });
-  } catch {
-    res.status(401).json({ success: false, error: 'Session error' });
+    const webResponse = await auth.handler(new globalThis.Request(url.toString(), { method: req.method, headers }));
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
+    res.send(await webResponse.text());
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
   }
 });
 
-// Google OAuth - redirect to Google
+router.all('/session', async (req: Request, res: Response) => {
+  try {
+    const url = new URL(`/api/v1/auth/session`, `http://${req.headers.host || 'localhost'}`);
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
+    }
+    const webResponse = await auth.handler(new globalThis.Request(url.toString(), { method: req.method, headers }));
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
+    res.send(await webResponse.text());
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+});
+
 router.get('/google', async (req: Request, res: Response) => {
   try {
     const url = new URL(req.originalUrl, `http://${req.headers.host || 'localhost'}`);
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
-      if (value) headers.set(key, Array.isArray(value) ? value[0] : value);
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
-    const webRequest = new globalThis.Request(url.toString(), { method: req.method, headers });
-    const webResponse = await auth.handler(webRequest);
+    const webResponse = await auth.handler(new globalThis.Request(url.toString(), { method: req.method, headers }));
     res.status(webResponse.status);
-    webResponse.headers.forEach((value, key) => { res.setHeader(key, value); });
-    const body = await webResponse.text();
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
     if (webResponse.status === 302 || webResponse.status === 301) {
       res.redirect(webResponse.headers.get('location') || '/');
     } else {
-      res.send(body);
+      res.send(await webResponse.text());
     }
-  } catch (error) {
-    console.error('Google OAuth error:', error);
+  } catch {
     res.redirect('/login?error=google_auth_failed');
   }
 });
 
-// Google OAuth callback
 router.get('/google/callback', async (req: Request, res: Response) => {
   try {
     const url = new URL(req.originalUrl, `http://${req.headers.host || 'localhost'}`);
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
-      if (value) headers.set(key, Array.isArray(value) ? value[0] : value);
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
-    const webRequest = new globalThis.Request(url.toString(), { method: req.method, headers });
-    const webResponse = await auth.handler(webRequest);
+    const webResponse = await auth.handler(new globalThis.Request(url.toString(), { method: req.method, headers }));
     res.status(webResponse.status);
-    webResponse.headers.forEach((value, key) => { res.setHeader(key, value); });
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
     if (webResponse.status === 302 || webResponse.status === 301) {
       res.redirect(webResponse.headers.get('location') || '/dashboard');
     } else {
-      const body = await webResponse.text();
-      res.send(body);
+      res.send(await webResponse.text());
     }
-  } catch (error) {
-    console.error('Google callback error:', error);
+  } catch {
     res.redirect('/login?error=google_callback_failed');
   }
 });

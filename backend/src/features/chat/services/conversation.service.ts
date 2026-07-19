@@ -15,7 +15,7 @@ interface ListParams {
 }
 
 export class ConversationService {
-  async list(params: ListParams) {
+  async list(params: ListParams): Promise<{ data: Record<string, unknown>[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     const { userId, page, limit, search, status, provider, favorite, pinned, sort } = params;
     const filter: Record<string, unknown> = { userId, deletedAt: { $exists: false } };
 

@@ -2,10 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import mongoose from 'mongoose';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
+import { requestLogger } from './middleware/requestLogger';
 import authRoutes from './features/auth/routes/auth.routes';
 import itemRoutes from './features/items/routes/item.routes';
 import dashboardRoutes from './features/dashboard/routes/dashboard.routes';
@@ -21,10 +24,12 @@ import agentRoutes from './features/agent/routes/agent.routes';
 const app = express();
 
 app.use(helmet());
+app.use(compression());
 app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: `${config.MAX_UPLOAD_SIZE}mb` }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(requestLogger);
 
 const limiter = rateLimit({
   windowMs: Number(config.RATE_LIMIT_WINDOW),
@@ -34,7 +39,16 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.1.0' });
+});
+
+app.get('/ready', async (_req, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.json({ status: 'ready', timestamp: new Date().toISOString() });
+  } catch {
+    res.status(503).json({ status: 'not ready', timestamp: new Date().toISOString() });
+  }
 });
 
 // Mount Better Auth at its default path

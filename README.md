@@ -9,6 +9,7 @@ A production-ready, full-stack Agentic AI Productivity Platform.
 - **Auth:** Better Auth (Google OAuth + Email/Password)
 - **AI:** Gemini, DeepSeek
 - **UI:** shadcn/ui, Framer Motion
+- **Infrastructure:** Docker, GitHub Actions CI/CD
 
 ## Features
 
@@ -32,7 +33,7 @@ The platform features a real-time AI chat assistant with streaming support:
 Upload, parse, and chunk documents for AI-powered analysis:
 
 - **File Upload** with validation (PDF, DOCX, TXT, Markdown)
-- **Document Parsing** using pdf-parse and mammoth libraries
+- **Document Parsing** using unpdf and mammoth libraries
 - **Smart Chunking** with configurable chunk sizes and overlap
 - **Processing Jobs** with real-time status tracking
 - Upload size limits (10MB) and file type validation
@@ -116,6 +117,12 @@ Better Auth is the single source of truth for all authentication:
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js 20+
+- MongoDB instance (local or Atlas)
+- npm or yarn
+
 ### Backend
 
 ```bash
@@ -135,7 +142,63 @@ npm install
 npm run dev
 ```
 
+### Docker
+
+```bash
+# Production build
+docker compose -f docker-compose.prod.yml up -d
+
+# Development
+docker compose up -d
+```
+
+## Environment Variables
+
+### Backend (.env)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| NODE_ENV | No | development | development/production/test |
+| PORT | No | 5000 | Server port |
+| MONGODB_URI | Yes | — | MongoDB connection string |
+| DATABASE_NAME | No | babnunur | Database name |
+| BETTER_AUTH_URL | Yes | — | Auth base URL |
+| BETTER_AUTH_SECRET | Yes | — | Auth secret (min 32 chars) |
+| JWT_SECRET | Yes | — | JWT signing secret (min 32 chars) |
+| GOOGLE_CLIENT_ID | No | — | Google OAuth client ID |
+| GOOGLE_CLIENT_SECRET | No | — | Google OAuth client secret |
+| GEMINI_API_KEY | No | — | Google Gemini API key |
+| DEEPSEEK_API_KEY | No | — | DeepSeek API key |
+| SMTP_HOST | No | — | SMTP server host |
+| SMTP_PORT | No | — | SMTP server port |
+| SMTP_USER | No | — | SMTP username |
+| SMTP_PASS | No | — | SMTP password |
+| CORS_ORIGIN | No | http://localhost:3000 | Allowed CORS origin |
+| MAX_UPLOAD_SIZE | No | 10 | Max upload size in MB |
+| ALLOWED_FILE_TYPES | No | image/*,application/pdf,.txt,.md,.csv | Allowed file types |
+| AI_REQUEST_TIMEOUT | No | 60000 | AI request timeout in ms |
+| AI_MAX_TOKENS | No | 4096 | Max tokens for AI responses |
+| AI_TEMPERATURE | No | 0.7 | AI temperature (0-1) |
+| LOG_LEVEL | No | info | error/warn/info/debug |
+| RATE_LIMIT_WINDOW | No | 900000 | Rate limit window in ms (15 min) |
+| RATE_LIMIT_MAX_REQUESTS | No | 100 | Max requests per window |
+
+### Frontend (.env)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| NEXT_PUBLIC_APP_URL | Yes | Frontend URL |
+| NEXT_PUBLIC_BACKEND_URL | Yes | Backend URL |
+| NEXT_PUBLIC_API_URL | Yes | Backend API URL |
+
 ## API Endpoints
+
+### Health & Readiness
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check with version |
+| GET | `/ready` | Readiness check (MongoDB ping) |
 
 ### Chat API
 
@@ -209,7 +272,7 @@ npm run dev
 | POST | `/api/v1/agent/plan` | Generate execution plan |
 | DELETE | `/api/v1/agent/memory/:conversationId` | Clear agent memory |
 
-## Project Structure
+## Architecture
 
 ```
 Babnunur/
@@ -247,50 +310,19 @@ Babnunur/
 │       │   ├── tools/           # Tool Calling system
 │       │   ├── users/           # User management
 │       │   └── websearch/       # Web Search integration
-│       ├── middleware/          # Auth, error handling
+│       ├── middleware/          # Auth, error handling, request logging
 │       └── app.ts               # Express app setup
 ├── docs/                        # Documentation
 └── README.md
 ```
 
-## Environment Variables
+## Contributing
 
-### Backend (.env)
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| NODE_ENV | No | development | development/production/test |
-| PORT | No | 5000 | Server port |
-| MONGODB_URI | Yes | — | MongoDB connection string |
-| DATABASE_NAME | No | babnunur | Database name |
-| BETTER_AUTH_URL | Yes | — | Auth base URL |
-| BETTER_AUTH_SECRET | Yes | — | Auth secret (min 32 chars) |
-| JWT_SECRET | Yes | — | JWT signing secret (min 32 chars) |
-| GOOGLE_CLIENT_ID | No | — | Google OAuth client ID |
-| GOOGLE_CLIENT_SECRET | No | — | Google OAuth client secret |
-| GEMINI_API_KEY | No | — | Google Gemini API key |
-| DEEPSEEK_API_KEY | No | — | DeepSeek API key |
-| SMTP_HOST | No | — | SMTP server host |
-| SMTP_PORT | No | — | SMTP server port |
-| SMTP_USER | No | — | SMTP username |
-| SMTP_PASS | No | — | SMTP password |
-| CORS_ORIGIN | No | http://localhost:3000 | Allowed CORS origin |
-| MAX_UPLOAD_SIZE | No | 10 | Max upload size in MB |
-| ALLOWED_FILE_TYPES | No | image/*,application/pdf,.txt,.md,.csv | Allowed file types |
-| AI_REQUEST_TIMEOUT | No | 60000 | AI request timeout in ms |
-| AI_MAX_TOKENS | No | 4096 | Max tokens for AI responses |
-| AI_TEMPERATURE | No | 0.7 | AI temperature (0-1) |
-| LOG_LEVEL | No | info | error/warn/info/debug |
-| RATE_LIMIT_WINDOW | No | 900000 | Rate limit window in ms (15 min) |
-| RATE_LIMIT_MAX_REQUESTS | No | 100 | Max requests per window |
-
-### Frontend (.env)
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| NEXT_PUBLIC_APP_URL | Yes | Frontend URL |
-| NEXT_PUBLIC_BACKEND_URL | Yes | Backend URL |
-| NEXT_PUBLIC_API_URL | Yes | Backend API URL |
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 

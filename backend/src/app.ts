@@ -20,6 +20,8 @@ import ragRoutes from './features/rag/routes/rag.routes';
 import searchRoutes from './features/websearch/routes/search.routes';
 import toolRoutes from './features/tools/routes/tool.routes';
 import agentRoutes from './features/agent/routes/agent.routes';
+import agentsRoutes from './features/agents/routes/agent.routes';
+import memoryRoutes from './features/memory/routes/memory.routes';
 
 const app = express();
 
@@ -44,6 +46,10 @@ app.get('/health', (_req, res) => {
 
 app.get('/ready', async (_req, res) => {
   try {
+    if (!mongoose.connection.db) {
+      res.status(503).json({ status: 'not ready', timestamp: new Date().toISOString() });
+      return;
+    }
     await mongoose.connection.db.admin().ping();
     res.json({ status: 'ready', timestamp: new Date().toISOString() });
   } catch {
@@ -97,6 +103,8 @@ app.use('/api/v1/rag', ragRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/tools', toolRoutes);
 app.use('/api/v1/agent', agentRoutes);
+app.use('/api/v1/memory', memoryRoutes);
+app.use('/api/v1/agents', agentsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

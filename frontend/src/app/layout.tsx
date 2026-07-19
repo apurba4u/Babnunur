@@ -1,3 +1,4 @@
+import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { QueryProvider } from '@/providers/query-provider';
 

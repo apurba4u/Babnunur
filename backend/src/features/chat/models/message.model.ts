@@ -8,7 +8,7 @@ const messageSchema = new Schema<MessageDocument>(
     conversationId: { type: String, required: true, index: true },
     userId: { type: String, required: true },
     role: { type: String, enum: ['user', 'assistant', 'system'], required: true },
-    content: { type: String, required: true },
+    content: { type: String, default: '' },
     messageType: { type: String, enum: ['text', 'markdown', 'code', 'image', 'file', 'system', 'tool'], default: 'text' },
     sequenceNumber: { type: Number, required: true },
     parentMessageId: { type: String },

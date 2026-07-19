@@ -12,21 +12,36 @@ declare global {
   }
 }
 
+// Simple in-memory session store for tokens
+const tokenStore = new Map<string, { userId: string; email: string; name: string }>();
+
+export const setSessionToken = (token: string, user: { userId: string; email: string; name: string }): void => {
+  tokenStore.set(token, user);
+};
+
 export const requireAuth = async (
   req: Request,
   _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
-    if (!session || !session.user) {
-      throw new UnauthorizedError('Authentication required');
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new UnauthorizedError('No authentication token');
     }
+
+    const token = authHeader.substring(7);
+    const session = tokenStore.get(token);
+
+    if (!session) {
+      throw new UnauthorizedError('Invalid or expired token');
+    }
+
     req.user = {
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-      role: (session.user as Record<string, unknown>).role as string || 'user',
+      id: session.userId,
+      email: session.email,
+      name: session.name,
+      role: 'user',
     };
     next();
   } catch {

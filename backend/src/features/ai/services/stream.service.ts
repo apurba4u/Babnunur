@@ -45,6 +45,12 @@ export class StreamService {
       sendEvent({ type: 'heartbeat', data: { timestamp: new Date().toISOString() } });
     }, DEFAULT_STREAM_CONFIG.heartbeatInterval);
 
+    // Abort stream if client disconnects
+    const onClientClose = (): void => {
+      abortController.abort();
+    };
+    res.on('close', onClientClose);
+
     try {
       const conversation = await conversationService.getById(conversationId, userId);
       const provider = ProviderFactory.getProvider(providerName || conversation.provider);
@@ -136,6 +142,7 @@ export class StreamService {
       const err = error as Error;
       sendEvent({ type: 'error', data: { code: 'STREAM_ERROR', message: err.message, retryable: false } });
     } finally {
+      res.removeListener('close', onClientClose);
       clearInterval(heartbeat);
       this.activeStreams.delete(requestId);
       if (!res.writableEnded) res.end();

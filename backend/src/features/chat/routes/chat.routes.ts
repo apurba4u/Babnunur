@@ -1,48 +1,50 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { streamService } from '../../ai/services/stream.service';
 import { chatService } from '../../ai/services/chat.service';
 import { requireAuth } from '../../../middleware/auth';
+import { streamMessageSchema, sendMessageSchema } from '../validations/chat.validation';
 
+// Rate limiting applied globally via app.ts (/api prefix)
 const router = Router();
 router.use(requireAuth);
 
-router.post('/stream', async (req: Request, res: Response) => {
-  const { conversationId, message, provider, model, temperature, maxTokens } = req.body;
+router.post('/stream', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const body = streamMessageSchema.parse(req.body);
 
-  if (!conversationId || !message) {
-    res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'conversationId and message are required' } });
-    return;
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    await streamService.streamChat({
+      userId: req.user!.id,
+      conversationId: body.conversationId,
+      content: body.message,
+      provider: body.provider,
+      model: body.model,
+      temperature: body.temperature,
+      maxTokens: body.maxTokens,
+      requestId: body.requestId,
+      res,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('X-Accel-Buffering', 'no');
-  res.flushHeaders();
-
-  await streamService.streamChat({
-    userId: req.user!.id,
-    conversationId,
-    content: message,
-    provider,
-    model,
-    temperature,
-    maxTokens,
-    res,
-  });
 });
 
-router.post('/send', async (req: Request, res: Response, next) => {
+router.post('/send', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { conversationId, message, provider, model, temperature, maxTokens } = req.body;
+    const body = sendMessageSchema.parse(req.body);
     const result = await chatService.sendMessage({
       userId: req.user!.id,
-      conversationId,
-      content: message,
-      provider,
-      model,
-      temperature,
-      maxTokens,
+      conversationId: body.conversationId,
+      content: body.message,
+      provider: body.provider,
+      model: body.model,
+      temperature: body.temperature,
+      maxTokens: body.maxTokens,
     });
     res.json({ success: true, data: result });
   } catch (err) {
@@ -50,10 +52,18 @@ router.post('/send', async (req: Request, res: Response, next) => {
   }
 });
 
-router.post('/cancel', async (req: Request, res: Response) => {
-  const { requestId } = req.body;
-  const cancelled = streamService.cancelStream(requestId);
-  res.json({ success: true, cancelled });
+router.post('/cancel', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { requestId } = req.body;
+    if (!requestId) {
+      res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'requestId is required' } });
+      return;
+    }
+    const cancelled = streamService.cancelStream(requestId);
+    res.json({ success: true, cancelled });
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;

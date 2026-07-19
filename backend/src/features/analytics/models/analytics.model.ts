@@ -4,7 +4,7 @@ export interface AnalyticsEventDocument extends Document {
   userId: string;
   eventType: string;
   provider: string;
-  model: string;
+  modelName: string;
   tokens: number;
   latency: number;
   metadata: Record<string, unknown>;
@@ -15,7 +15,7 @@ const analyticsSchema = new Schema<AnalyticsEventDocument>({
   userId: { type: String, required: true, index: true },
   eventType: { type: String, required: true, index: true },
   provider: { type: String, default: 'unknown' },
-  model: { type: String, default: 'unknown' },
+  modelName: { type: String, default: 'unknown' },
   tokens: { type: Number, default: 0 },
   latency: { type: Number, default: 0 },
   metadata: { type: Schema.Types.Mixed, default: {} },

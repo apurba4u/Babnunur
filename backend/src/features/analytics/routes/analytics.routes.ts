@@ -1,6 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { requireAuth } from '../../../middleware/auth';
-import { requireRole } from '../../../middleware/rbac';
 import { analyticsService } from '../services/analytics.service';
 
 const router = Router();

@@ -1,10 +1,11 @@
-import { AnalyticsEvent } from '../models/analytics.model';
+import { AnalyticsEvent, AnalyticsEventDocument } from '../models/analytics.model';
 import { User } from '../../users/models/user.model';
-import { Conversation } from '../../chat/models/conversation.model';
-import { Document } from '../../documents/models/document.model';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AggregationResult = { _id: string | null; requests?: number; tokens?: number; total?: number };
 
 export class AnalyticsService {
-  async recordEvent(data: { userId: string; eventType: string; provider?: string; model?: string; tokens?: number; latency?: number; metadata?: Record<string, unknown> }) {
+  async recordEvent(data: { userId: string; eventType: string; provider?: string; modelName?: string; tokens?: number; latency?: number; metadata?: Record<string, unknown> }): Promise<AnalyticsEventDocument> {
     return AnalyticsEvent.create(data);
   }
 
@@ -25,12 +26,12 @@ export class AnalyticsService {
       totalUsers,
       totalRequests,
       totalTokens: totalTokens[0]?.total || 0,
-      providerBreakdown: Object.fromEntries(providerBreakdown.map((p: any) => [p._id || 'unknown', { requests: p.requests, tokens: p.tokens }])),
-      recentActivity: recentActivity.map((r: any) => ({ date: r._id, requests: r.requests, tokens: r.tokens })),
+      providerBreakdown: Object.fromEntries(providerBreakdown.map((p: AggregationResult) => [p._id || 'unknown', { requests: p.requests, tokens: p.tokens }])),
+      recentActivity: recentActivity.map((r: AggregationResult) => ({ date: r._id, requests: r.requests, tokens: r.tokens })),
     };
   }
 
-  async getUserStats(userId: string) {
+  async getUserStats(userId: string): Promise<{ requestCount: number; tokenUsage: number; lastActive: Date | null }> {
     const [eventCount, tokenTotal, lastEvent] = await Promise.all([
       AnalyticsEvent.countDocuments({ userId }),
       AnalyticsEvent.aggregate([{ $match: { userId } }, { $group: { _id: null, total: { $sum: '$tokens' } } }]),

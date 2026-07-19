@@ -12,7 +12,7 @@ router.get('/providers', (_req: Request, res: Response) => {
 
 router.post('/embed/:documentId', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await embeddingService.embedChunks(req.params.documentId, req.user!.id, req.body.provider);
+    await embeddingService.embedChunks(String(req.params.documentId), req.user!.id, req.body.provider);
     res.json({ success: true, message: 'Document embedded successfully' });
   } catch (err) { next(err); }
 });

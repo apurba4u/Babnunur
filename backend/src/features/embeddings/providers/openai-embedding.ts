@@ -23,7 +23,8 @@ export class OpenAIEmbeddingProvider extends BaseEmbeddingProvider {
       }),
     });
 
-    const data = await response.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any = await response.json();
     return data.data.map((item: { embedding: number[] }) => item.embedding);
   }
 

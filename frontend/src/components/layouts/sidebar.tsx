@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, FileText, Sparkles, LayoutDashboard, Settings } from 'lucide-react';
+import { MessageSquare, FileText, Sparkles, LayoutDashboard, Settings, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Items', href: '/dashboard/items', icon: Package },
   { name: 'Chat', href: '/dashboard/chat', icon: MessageSquare },
   { name: 'Documents', href: '/dashboard/documents', icon: FileText },
   { name: 'Recommendations', href: '/dashboard/recommendations', icon: Sparkles },

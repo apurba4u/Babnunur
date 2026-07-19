@@ -1,5 +1,4 @@
 export interface MemoryEntry {
-  id: string;
   userId: string;
   conversationId?: string;
   type: 'session' | 'user' | 'topic' | 'fact';
@@ -13,6 +12,7 @@ export interface MemoryEntry {
 
 export interface MemoryQuery {
   userId: string;
+  conversationId?: string;
   query?: string;
   type?: string;
   limit?: number;

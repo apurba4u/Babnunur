@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { MemoryEntry } from '../types';
 
-export interface MemoryDocument extends MemoryEntry, Document {}
+export interface MemoryDocument extends Omit<MemoryEntry, 'id'>, Document {}
 
 const memorySchema = new Schema<MemoryDocument>({
   userId: { type: String, required: true, index: true },

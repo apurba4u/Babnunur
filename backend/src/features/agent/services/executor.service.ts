@@ -2,11 +2,11 @@ import { AgentPlan, AgentStep, AgentResponse } from '../types';
 import { toolExecutor } from '../../tools/executor';
 import { searchService } from '../../websearch/services/search.service';
 import { ragService } from '../../rag/services/rag.service';
-import { memoryService } from './memory.service';
+import { agentMemoryService } from './memory.service';
 
 export class ExecutorService {
   async execute(plan: AgentPlan, userId: string, conversationId: string): Promise<AgentResponse> {
-    memoryService.get(conversationId);
+    await agentMemoryService.get(conversationId, userId);
     const executedSteps: AgentStep[] = [];
     const allCitations: unknown[] = [];
     const toolsUsed: string[] = [];
@@ -14,7 +14,7 @@ export class ExecutorService {
     for (const step of plan.steps) {
       if (step.type === 'think') {
         executedSteps.push(step);
-        memoryService.addFact(conversationId, step.content);
+        await agentMemoryService.addFact(conversationId, userId, step.content);
       } else if (step.type === 'act') {
         if (step.searchQuery) {
           const results = await searchService.search(step.searchQuery, { count: 5 });
@@ -29,7 +29,6 @@ export class ExecutorService {
           step.toolCall.result = result.data;
           executedSteps.push(step);
           toolsUsed.push(step.toolCall.name);
-          memoryService.addToolUse(conversationId, step.toolCall.name);
         } else if (step.documentIds?.length) {
           const results = await ragService.chatWithDocuments(
             { query: step.content, documentIds: step.documentIds },
@@ -46,7 +45,7 @@ export class ExecutorService {
 
     const finalResponse = executedSteps.filter((s) => s.type === 'respond').map((s) => s.content).join('\n') || 'I have completed the requested task.';
 
-    memoryService.addMessage(conversationId, 'assistant', finalResponse);
+    await agentMemoryService.addMessage(conversationId, userId, 'assistant', finalResponse);
 
     return {
       answer: finalResponse,

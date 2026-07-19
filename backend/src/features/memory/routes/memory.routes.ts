@@ -14,14 +14,17 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
 router.get('/search', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const results = await memoryService.search({ userId: req.user!.id, query: req.query.query as string, type: req.query.type as string, limit: Number(req.query.limit) || 20 });
+    const queryType = Array.isArray(req.query.type) ? req.query.type[0] as string : (req.query.type as string | undefined);
+    const querySearch = req.query.query as string | undefined;
+    const results = await memoryService.search({ userId: req.user!.id, query: querySearch, type: queryType, limit: Number(req.query.limit) || 20 });
     res.json({ success: true, data: results });
   } catch (err) { next(err); }
 });
 
 router.get('/summarize/:conversationId', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const summary = await memoryService.summarize(req.params.conversationId, req.user!.id);
+    const conversationId = req.params.conversationId as string;
+    const summary = await memoryService.summarize(conversationId, req.user!.id);
     res.json({ success: true, data: { summary } });
   } catch (err) { next(err); }
 });

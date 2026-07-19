@@ -26,6 +26,7 @@ import knowledgeBaseRoutes from './features/knowledge/routes/knowledge-base.rout
 import teamRoutes from './features/teams/routes/team.routes';
 import workflowRoutes from './features/workflows/routes/workflow.routes';
 import pluginRoutes from './features/plugins/routes/plugin.routes';
+import analyticsRoutes from './features/analytics/routes/analytics.routes';
 
 const app = express();
 
@@ -113,6 +114,7 @@ app.use('/api/v1/agents', agentsRoutes);
 app.use('/api/v1/teams', teamRoutes);
 app.use('/api/v1/workflows', workflowRoutes);
 app.use('/api/v1/plugins', pluginRoutes);
+app.use('/api/v1/analytics', analyticsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

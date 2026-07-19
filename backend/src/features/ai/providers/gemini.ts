@@ -19,7 +19,7 @@ export class GeminiProvider implements AIProvider {
     this.client = new GoogleGenerativeAI(config.GEMINI_API_KEY);
   }
 
-  private get model() {
+  private get model(): ReturnType<GoogleGenerativeAI['getGenerativeModel']> {
     return this.client.getGenerativeModel({ model: aiConfig.defaultModel.gemini });
   }
 

@@ -17,7 +17,7 @@ export class ProviderFactory {
     return provider;
   }
   static getAvailableProviders(): ProviderModelInfo[] { return Array.from(ProviderFactory.providers.values()).map((p) => p.getModelInfo()); }
-  static getCapabilities(name: string) {
+  static getCapabilities(name: string): { supportsStreaming: boolean; supportsVision: boolean; supportsToolCalling: boolean } | null {
     const provider = ProviderFactory.providers.get(name);
     if (!provider) return null;
     return { supportsStreaming: provider.supportsStreaming(), supportsVision: provider.supportsVision(), supportsToolCalling: provider.supportsToolCalling() };

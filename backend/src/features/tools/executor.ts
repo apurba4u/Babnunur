@@ -1,4 +1,4 @@
-import { Tool, ToolCall, ToolResult } from './types';
+import { ToolCall, ToolResult } from './types';
 import { toolRegistry } from './registry';
 
 export class ToolExecutor {

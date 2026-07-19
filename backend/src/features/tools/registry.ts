@@ -1,4 +1,4 @@
-import { Tool } from './types';
+import { Tool, ToolParameter } from './types';
 import { calculatorTool } from './tools/calculator';
 import { datetimeTool } from './tools/datetime';
 import { uuidTool } from './tools/uuid';
@@ -26,7 +26,7 @@ class ToolRegistry {
     return Array.from(this.tools.values());
   }
 
-  getSchemas() {
+  getSchemas(): Array<{ name: string; description: string; parameters: Record<string, ToolParameter> }> {
     return this.getAll().map((t) => ({
       name: t.name,
       description: t.description,

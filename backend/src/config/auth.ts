@@ -10,8 +10,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: config.GOOGLE_OAUTH_CLIENT_ID || '',
-      clientSecret: config.GOOGLE_OAUTH_CLIENT_SECRET || '',
+      clientId: config.GOOGLE_CLIENT_ID || '',
+      clientSecret: config.GOOGLE_CLIENT_SECRET || '',
     },
   },
 });

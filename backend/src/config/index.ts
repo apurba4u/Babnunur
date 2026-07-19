@@ -11,9 +11,14 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string().url(),
   BETTER_AUTH_SECRET: z.string().min(32),
   JWT_SECRET: z.string().min(32),
-  JWT_REFRESH_SECRET: z.string().min(32),
-  GOOGLE_OAUTH_CLIENT_ID: z.string().optional(),
-  GOOGLE_OAUTH_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  DEEPSEEK_API_KEY: z.string().optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
 });
 

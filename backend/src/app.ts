@@ -110,6 +110,7 @@ app.use('/api/v1/memory', memoryRoutes);
 app.use('/api/v1/knowledge', knowledgeBaseRoutes);
 app.use('/api/v1/agents', agentsRoutes);
 app.use('/api/v1/workflows', workflowRoutes);
+app.use('/api/v1/plugins', pluginRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

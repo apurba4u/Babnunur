@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
+import authRoutes from './features/auth/routes/auth.routes';
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use('/api', limiter);
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+app.use('/api/v1/auth', authRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -2,7 +2,7 @@ export interface IConversation {
   userId: string;
   title: string;
   provider: string;
-  model: string;
+  modelName: string;
   modelVersion: string;
   systemPrompt?: string;
   status: 'active' | 'archived' | 'deleted';
@@ -41,7 +41,7 @@ export interface IMessage {
   status: 'streaming' | 'completed' | 'failed' | 'cancelled';
   finishReason?: 'stop' | 'length' | 'error' | 'cancelled';
   provider: string;
-  model: string;
+  modelName: string;
   tokenCount: number;
   inputTokens: number;
   outputTokens: number;

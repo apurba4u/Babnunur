@@ -8,7 +8,7 @@ const conversationSchema = new Schema<ConversationDocument>(
     userId: { type: String, required: true, index: true },
     title: { type: String, required: true, trim: true, default: 'New Conversation' },
     provider: { type: String, required: true, default: 'gemini' },
-    model: { type: String, required: true, default: 'gemini-2.0-flash' },
+    modelName: { type: String, required: true, default: 'gemini-2.0-flash' },
     modelVersion: { type: String, default: '' },
     systemPrompt: { type: String },
     status: { type: String, enum: ['active', 'archived', 'deleted'], default: 'active' },

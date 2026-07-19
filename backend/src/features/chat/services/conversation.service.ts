@@ -1,4 +1,5 @@
 import { Conversation, ConversationDocument } from '../models/conversation.model';
+import { IConversation } from '../types';
 import { NotFoundError } from '../../../core/errors';
 
 interface ListParams {
@@ -57,12 +58,12 @@ export class ConversationService {
     settings?: Record<string, unknown>;
   }): Promise<ConversationDocument> {
     return Conversation.create({
-      userId,
+      userId: data.userId,
       title: data.title || 'New Conversation',
       provider: data.provider || 'gemini',
-      model: data.model || 'gemini-2.0-flash',
+      modelName: data.model || 'gemini-2.0-flash',
       systemPrompt: data.systemPrompt,
-      settings: data.settings as any,
+      settings: data.settings as IConversation['settings'],
     });
   }
 
@@ -72,7 +73,7 @@ export class ConversationService {
     data: Partial<{
       title: string;
       provider: string;
-      model: string;
+      modelName: string;
       systemPrompt: string;
       settings: Record<string, unknown>;
       tags: string[];

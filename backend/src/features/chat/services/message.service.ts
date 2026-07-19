@@ -32,7 +32,7 @@ export class MessageService {
     role: 'user' | 'assistant' | 'system';
     content: string;
     provider: string;
-    model: string;
+    modelName: string;
     messageType?: string;
     parentMessageId?: string;
     status?: string;

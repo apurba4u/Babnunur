@@ -15,7 +15,7 @@ const messageSchema = new Schema<MessageDocument>(
     status: { type: String, enum: ['streaming', 'completed', 'failed', 'cancelled'], default: 'completed' },
     finishReason: { type: String, enum: ['stop', 'length', 'error', 'cancelled'] },
     provider: { type: String, required: true },
-    model: { type: String, required: true },
+    modelName: { type: String, required: true },
     tokenCount: { type: Number, default: 0 },
     inputTokens: { type: Number, default: 0 },
     outputTokens: { type: Number, default: 0 },

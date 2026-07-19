@@ -1,6 +1,5 @@
 import { Response } from 'express';
 import { ProviderFactory } from '../providers/factory';
-import { promptEngine } from '../prompts/engine';
 import { conversationService } from '../../chat/services/conversation.service';
 import { messageService } from '../../chat/services/message.service';
 import { ChatMessage } from '../types';
@@ -36,7 +35,7 @@ export class StreamService {
       estimatedCost: 0,
     };
 
-    const sendEvent = (event: StreamEvent) => {
+    const sendEvent = (event: StreamEvent): void => {
       if (!res.writableEnded) {
         res.write(`event: ${event.type}\ndata: ${JSON.stringify(event.data)}\n\n`);
       }
@@ -57,7 +56,7 @@ export class StreamService {
         role: 'user',
         content,
         provider: providerName || conversation.provider,
-        model: model || conversation.model,
+        modelName: model || conversation.modelName,
       });
 
       // Build context
@@ -74,7 +73,7 @@ export class StreamService {
         role: 'assistant',
         content: '',
         provider: providerName || conversation.provider,
-        model: model || conversation.model,
+        modelName: model || conversation.modelName,
         status: 'streaming',
       });
 
@@ -86,7 +85,7 @@ export class StreamService {
       for await (const chunk of provider.streamChat(messages, {
         temperature: temperature ?? conversation.settings?.temperature,
         maxTokens: maxTokens ?? conversation.settings?.maxTokens,
-        model: model || conversation.model,
+        model: model || conversation.modelName,
         requestId,
       })) {
         if (abortController.signal.aborted) {

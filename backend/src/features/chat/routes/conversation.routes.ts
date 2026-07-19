@@ -35,51 +35,58 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const conv = await conversationService.getById(req.params.id, req.user!.id);
-    const messages = await messageService.listByConversation(req.params.id, req.user!.id, { limit: 100 });
+    const id = req.params.id as string;
+    const conv = await conversationService.getById(id, req.user!.id);
+    const messages = await messageService.listByConversation(id, req.user!.id, { limit: 100 });
     res.json({ success: true, data: { ...conv.toObject(), messages } });
   } catch (err) { next(err); }
 });
 
 router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const id = req.params.id as string;
     const data = updateConversationSchema.parse(req.body);
-    const conv = await conversationService.update(req.params.id, req.user!.id, data);
+    const conv = await conversationService.update(id, req.user!.id, data);
     res.json({ success: true, data: conv });
   } catch (err) { next(err); }
 });
 
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await conversationService.delete(req.params.id, req.user!.id);
+    const id = req.params.id as string;
+    await conversationService.delete(id, req.user!.id);
     res.json({ success: true, message: 'Conversation deleted' });
   } catch (err) { next(err); }
 });
 
 router.post('/:id/archive', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const conv = await conversationService.archive(req.params.id, req.user!.id);
+    const id = req.params.id as string;
+    const conv = await conversationService.archive(id, req.user!.id);
     res.json({ success: true, data: conv });
   } catch (err) { next(err); }
 });
 
 router.post('/:id/restore', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const conv = await conversationService.restore(req.params.id, req.user!.id);
+    const id = req.params.id as string;
+    const conv = await conversationService.restore(id, req.user!.id);
     res.json({ success: true, data: conv });
   } catch (err) { next(err); }
 });
 
 router.post('/:id/favorite', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const conv = await conversationService.toggleFavorite(req.params.id, req.user!.id);
+    const id = req.params.id as string;
+    const conv = await conversationService.toggleFavorite(id, req.user!.id);
     res.json({ success: true, data: conv });
   } catch (err) { next(err); }
 });
 
 router.post('/:id/pin', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const conv = await conversationService.togglePin(req.params.id, req.user!.id);
+    const id = req.params.id as string;
+    const conv = await conversationService.togglePin(id, req.user!.id);
     res.json({ success: true, data: conv });
   } catch (err) { next(err); }
 });

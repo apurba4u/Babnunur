@@ -1,8 +1,8 @@
 import { ProviderFactory } from '../providers/factory';
-import { promptEngine } from '../prompts/engine';
 import { conversationService } from '../../chat/services/conversation.service';
 import { messageService } from '../../chat/services/message.service';
-import { ChatMessage, ChatOptions, ChatResponse } from '../types';
+import { ChatMessage, ChatResponse } from '../types';
+import { MessageDocument } from '../../chat/models/message.model';
 
 export class ChatService {
   async sendMessage(params: {
@@ -13,7 +13,7 @@ export class ChatService {
     model?: string;
     temperature?: number;
     maxTokens?: number;
-  }): Promise<{ userMessage: any; assistantMessage: any; response: ChatResponse }> {
+  }): Promise<{ userMessage: MessageDocument; assistantMessage: MessageDocument; response: ChatResponse }> {
     const { userId, conversationId, content, provider: providerName, model, temperature, maxTokens } = params;
 
     const conversation = await conversationService.getById(conversationId, userId);
@@ -25,7 +25,7 @@ export class ChatService {
       role: 'user',
       content,
       provider: providerName || conversation.provider,
-      model: model || conversation.model,
+      modelName: model || conversation.modelName,
     });
 
     // Build context
@@ -45,7 +45,7 @@ export class ChatService {
       role: 'assistant',
       content: '',
       provider: providerName || conversation.provider,
-      model: model || conversation.model,
+      modelName: model || conversation.modelName,
       status: 'streaming',
     });
 
@@ -53,7 +53,7 @@ export class ChatService {
     const response = await provider.chat(messages, {
       temperature: temperature ?? conversation.settings?.temperature,
       maxTokens: maxTokens ?? conversation.settings?.maxTokens,
-      model: model || conversation.model,
+      model: model || conversation.modelName,
     });
 
     // Update assistant message

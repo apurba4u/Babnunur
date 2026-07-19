@@ -7,6 +7,7 @@ import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import authRoutes from './features/auth/routes/auth.routes';
+import itemRoutes from './features/items/routes/item.routes';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/items', itemRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

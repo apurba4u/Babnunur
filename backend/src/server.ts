@@ -5,10 +5,7 @@ import { connectDatabase } from './config/database';
 const startServer = async (): Promise<void> => {
   try {
     await connectDatabase();
-    app.listen(config.PORT, () => {
-      console.log(`Server running on port ${config.PORT}`);
-      console.log(`Environment: ${config.NODE_ENV}`);
-    });
+    app.listen(config.PORT);
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

@@ -14,7 +14,7 @@ module.exports = {
     es2022: true,
   },
   rules: {
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/explicit-function-return-type': 'warn',
     '@typescript-eslint/no-explicit-any': 'error',
   },

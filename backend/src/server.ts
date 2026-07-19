@@ -2,7 +2,7 @@ import app from './app';
 import { config } from './config';
 import { connectDatabase } from './config/database';
 
-const startServer = async () => {
+const startServer = async (): Promise<void> => {
   try {
     await connectDatabase();
     app.listen(config.PORT, () => {

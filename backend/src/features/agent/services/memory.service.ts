@@ -1,45 +1,29 @@
+import { memoryService } from '../../memory/services/memory.service';
 import { AgentMemory } from '../types';
 
-export class MemoryService {
-  private memories = new Map<string, AgentMemory>();
-
-  get(conversationId: string): AgentMemory {
-    if (!this.memories.has(conversationId)) {
-      this.memories.set(conversationId, {
-        conversationId,
-        messages: [],
-        facts: [],
-        toolsUsed: [],
-        documentsReferenced: [],
-      });
-    }
-    return this.memories.get(conversationId)!;
+export class AgentMemoryService {
+  async get(conversationId: string, userId: string): Promise<AgentMemory> {
+    const entries = await memoryService.search({ userId, conversationId, limit: 50 });
+    return {
+      conversationId,
+      messages: entries.filter(e => e.type === 'session').map(e => ({ role: 'user', content: e.content })),
+      facts: entries.filter(e => e.type === 'fact').map(e => e.content),
+      toolsUsed: [],
+      documentsReferenced: [],
+    };
   }
 
-  addMessage(conversationId: string, role: string, content: string): void {
-    const memory = this.get(conversationId);
-    memory.messages.push({ role, content });
-    if (memory.messages.length > 20) memory.messages.shift();
+  async addMessage(conversationId: string, userId: string, role: string, content: string): Promise<void> {
+    await memoryService.add({ userId, conversationId, type: 'session', content, importance: 0.5, metadata: { role } });
   }
 
-  addFact(conversationId: string, fact: string): void {
-    const memory = this.get(conversationId);
-    if (!memory.facts.includes(fact)) memory.facts.push(fact);
+  async addFact(conversationId: string, userId: string, fact: string): Promise<void> {
+    await memoryService.add({ userId, conversationId, type: 'fact', content: fact, importance: 0.8, metadata: {} });
   }
 
-  addToolUse(conversationId: string, toolName: string): void {
-    const memory = this.get(conversationId);
-    if (!memory.toolsUsed.includes(toolName)) memory.toolsUsed.push(toolName);
-  }
-
-  addDocumentReference(conversationId: string, documentId: string): void {
-    const memory = this.get(conversationId);
-    if (!memory.documentsReferenced.includes(documentId)) memory.documentsReferenced.push(documentId);
-  }
-
-  clear(conversationId: string): void {
-    this.memories.delete(conversationId);
+  async addTopic(conversationId: string, userId: string, topic: string): Promise<void> {
+    await memoryService.add({ userId, conversationId, type: 'topic', content: topic, importance: 0.6, metadata: {} });
   }
 }
 
-export const memoryService = new MemoryService();
+export const agentMemoryService = new AgentMemoryService();

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import { recordRequest } from '../shared/metrics';
 
 export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const requestId = crypto.randomUUID();
@@ -9,6 +10,8 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
 
   res.on('finish', () => {
     const duration = Date.now() - start;
+    const isError = res.statusCode >= 400;
+    recordRequest(duration, isError);
     const log = {
       requestId,
       method: req.method,

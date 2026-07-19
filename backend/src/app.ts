@@ -12,6 +12,7 @@ import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import { requestLogger } from './middleware/requestLogger';
+import { securityHeaders } from './middleware/security-headers';
 import authRoutes from './features/auth/routes/auth.routes';
 import itemRoutes from './features/items/routes/item.routes';
 import dashboardRoutes from './features/dashboard/routes/dashboard.routes';
@@ -35,6 +36,7 @@ import analyticsRoutes from './features/analytics/routes/analytics.routes';
 const app = express();
 
 app.use(helmet());
+app.use(securityHeaders);
 app.use(compression());
 app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: `${config.MAX_UPLOAD_SIZE}mb` }));

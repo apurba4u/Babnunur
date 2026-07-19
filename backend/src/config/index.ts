@@ -20,6 +20,14 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
+  MAX_UPLOAD_SIZE: z.string().default('10'),
+  ALLOWED_FILE_TYPES: z.string().default('image/*,application/pdf,.txt,.md,.csv'),
+  AI_REQUEST_TIMEOUT: z.string().default('60000'),
+  AI_MAX_TOKENS: z.string().default('4096'),
+  AI_TEMPERATURE: z.string().default('0.7'),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  RATE_LIMIT_WINDOW: z.string().default('900000'),
+  RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
 });
 
 const parsed = envSchema.safeParse(process.env);

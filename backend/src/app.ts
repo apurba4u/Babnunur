@@ -12,13 +12,13 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: `${config.MAX_UPLOAD_SIZE}mb` }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: Number(config.RATE_LIMIT_WINDOW),
+  max: Number(config.RATE_LIMIT_MAX_REQUESTS),
   message: 'Too many requests from this IP',
 });
 app.use('/api', limiter);

@@ -10,33 +10,86 @@ A production-ready, full-stack Agentic AI Productivity Platform.
 - **AI:** Gemini, DeepSeek
 - **UI:** shadcn/ui, Framer Motion
 
-## AI Chat Assistant
+## Features
+
+### AI Chat Assistant
 
 The platform features a real-time AI chat assistant with streaming support:
-
-### Streaming Architecture
 
 - **Server-Sent Events (SSE)** for real-time token streaming
 - **AbortController** for client disconnect handling and cancellation
 - **Heartbeat mechanism** to maintain connection stability
 - **Graceful error handling** with no provider SDK errors exposed to clients
-
-### Supported Providers
-
-| Provider | Models | Features |
-|----------|--------|----------|
-| Google Gemini | gemini-2.0-flash, gemini-2.5-pro | Streaming, function calling |
-| DeepSeek | deepseek-chat, deepseek-coder | Streaming, code assistance |
-
-### Features
-
-- Real-time streaming responses
 - Conversation management (create, update, delete, archive)
 - Message history with pagination
 - Favorites and pinning
 - System prompt customization
 - Token usage tracking
 - Request cancellation support
+
+### Document Intelligence
+
+Upload, parse, and chunk documents for AI-powered analysis:
+
+- **File Upload** with validation (PDF, DOCX, TXT, Markdown)
+- **Document Parsing** using pdf-parse and mammoth libraries
+- **Smart Chunking** with configurable chunk sizes and overlap
+- **Processing Jobs** with real-time status tracking
+- Upload size limits (10MB) and file type validation
+
+### Embeddings & Vector Search
+
+Generate and search through document embeddings:
+
+- **Embedding Providers:** OpenAI embeddings, local embedding service
+- **Vector Service** for similarity search across document chunks
+- **Per-user vector isolation** for data privacy
+- **Configurable top-K** results for search queries
+
+### RAG (Retrieval-Augmented Generation)
+
+Combine document context with AI responses:
+
+- **Context Retrieval** from embedded document chunks
+- **Streaming RAG** with citation support
+- **Document-scoped chat** with selected documents as context
+- **Citation Viewer** showing source documents and chunks
+
+### Web Search
+
+Real-time web search integration:
+
+- **DuckDuckGo** search provider
+- **Multi-provider search** with result aggregation
+- **Configurable result counts** per query
+- **Provider discovery** endpoint for available search providers
+
+### Tool Calling
+
+Extensible tool system for AI agent capabilities:
+
+- **Tool Registry** with schema-based tool definitions
+- **Built-in Tools:** Calculator, DateTime, UUID generator, JSON formatter
+- **Batch Execution** for multiple tool calls
+- **Per-user tool isolation** for data privacy
+
+### AI Agent Orchestrator
+
+Multi-step AI agent with planning and execution:
+
+- **Planner Service** for goal decomposition
+- **Executor Service** for tool orchestration
+- **Memory Service** for conversation context
+- **Document-aware planning** with selected documents
+
+### AI Workspace
+
+Unified interface for document-driven AI conversations:
+
+- **Document Panel** with selection and management
+- **Search Panel** for web search integration
+- **Citation Viewer** for source tracking
+- **Context-aware chat** with selected documents
 
 ## Authentication
 
@@ -106,6 +159,56 @@ npm run dev
 | POST | `/api/v1/conversations/:id/favorite` | Toggle favorite |
 | POST | `/api/v1/conversations/:id/pin` | Toggle pin |
 
+### Document API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/documents` | List documents |
+| POST | `/api/v1/documents/upload` | Upload document |
+| GET | `/api/v1/documents/:id` | Get document details |
+| GET | `/api/v1/documents/:id/chunks` | Get document chunks |
+| GET | `/api/v1/documents/:id/status` | Get processing status |
+| DELETE | `/api/v1/documents/:id` | Delete document |
+
+### Embedding API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/embeddings/providers` | List embedding providers |
+| POST | `/api/v1/embeddings/embed/:documentId` | Embed document chunks |
+| POST | `/api/v1/embeddings/search` | Vector similarity search |
+
+### RAG API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/rag/chat` | Chat with document context |
+| POST | `/api/v1/rag/stream` | Stream RAG response (SSE) |
+
+### Web Search API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/search/providers` | List search providers |
+| POST | `/api/v1/search` | Search with single provider |
+| POST | `/api/v1/search/multi` | Search with multiple providers |
+
+### Tool API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/tools` | List available tools |
+| POST | `/api/v1/tools/execute` | Execute single tool |
+| POST | `/api/v1/tools/execute-batch` | Execute multiple tools |
+
+### Agent API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/agent/run` | Run agent with goal |
+| POST | `/api/v1/agent/plan` | Generate execution plan |
+| DELETE | `/api/v1/agent/memory/:conversationId` | Clear agent memory |
+
 ## Project Structure
 
 ```
@@ -113,27 +216,40 @@ Babnunur/
 ├── frontend/                    # Next.js 15 App Router
 │   └── src/
 │       ├── app/                 # App router pages
+│       │   ├── (auth)/          # Auth pages (login, register)
+│       │   └── (dashboard)/     # Dashboard pages (chat, documents, workspace, items)
 │       ├── components/          # Shared UI components
+│       │   ├── layouts/         # Layout components (sidebar, header)
+│       │   └── ui/              # shadcn/ui components
 │       ├── features/
-│       │   ├── ai-chat/         # AI Chat feature
-│       │   ├── auth/            # Authentication
-│       │   ├── dashboard/       # Dashboard
-│       │   └── items/           # Items management
-│       ├── lib/                 # Utilities
-│       └── providers/           # Context providers
+│       │   ├── ai-chat/         # AI Chat feature (streaming, conversations)
+│       │   ├── auth/            # Authentication (login, register forms)
+│       │   ├── dashboard/       # Dashboard (stats, recent activity)
+│       │   ├── documents/       # Document management (upload, list, parse)
+│       │   ├── items/           # Items management
+│       │   └── workspace/       # AI Workspace (search, documents, citations)
+│       ├── lib/                 # Utilities (axios, cn)
+│       └── providers/           # Context providers (query, theme)
 ├── backend/                     # Express.js Modular Monolith
 │   └── src/
-│       ├── config/              # Configuration
+│       ├── config/              # Configuration (auth, database)
 │       ├── core/                # Core types, errors
 │       ├── features/
-│       │   ├── ai/              # AI services & providers
-│       │   ├── auth/            # Authentication
-│       │   ├── chat/            # Chat & conversations
-│       │   ├── dashboard/       # Dashboard
+│       │   ├── agent/           # AI Agent orchestrator (planner, executor, memory)
+│       │   ├── ai/              # AI services (providers, streaming, prompts)
+│       │   ├── auth/            # Authentication (Better Auth)
+│       │   ├── chat/            # Chat & conversations (streaming, messages)
+│       │   ├── dashboard/       # Dashboard (stats, activity)
+│       │   ├── documents/       # Document Intelligence (upload, parse, chunk)
+│       │   ├── embeddings/      # Embeddings & Vector Search
 │       │   ├── items/           # Items management
-│       │   └── users/           # User management
+│       │   ├── rag/             # RAG (Retrieval-Augmented Generation)
+│       │   ├── tools/           # Tool Calling system
+│       │   ├── users/           # User management
+│       │   └── websearch/       # Web Search integration
 │       ├── middleware/          # Auth, error handling
 │       └── app.ts               # Express app setup
+├── docs/                        # Documentation
 └── README.md
 ```
 

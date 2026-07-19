@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
@@ -62,6 +65,13 @@ app.get('/ready', async (_req, res) => {
     res.status(503).json({ status: 'not ready', timestamp: new Date().toISOString() });
   }
 });
+
+try {
+  const swaggerDocument = YAML.load(path.join(__dirname, 'docs/openapi.yaml'));
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+} catch (e) {
+  console.warn('Swagger docs not loaded:', (e as Error).message);
+}
 
 // Mount Better Auth at its default path
 app.all('/api/auth/*', async (req, res) => {

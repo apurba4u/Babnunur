@@ -1,0 +1,291 @@
+openapi: 3.0.3
+info:
+  title: Babnunur API
+  description: Enterprise AI SaaS Platform API
+  version: 3.0.1
+servers:
+  - url: http://localhost:5001/api/v1
+    description: Development
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [System]
+      responses:
+        '200':
+          description: OK
+
+  /ready:
+    get:
+      summary: Readiness check
+      tags: [System]
+      responses:
+        '200':
+          description: Ready
+        '503':
+          description: Not ready
+
+  /auth/sign-up:
+    post:
+      summary: Register user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '200':
+          description: User registered
+
+  /auth/sign-in:
+    post:
+      summary: Sign in
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Signed in
+
+  /auth/sign-out:
+    post:
+      summary: Sign out
+      tags: [Auth]
+      responses:
+        '200':
+          description: Signed out
+
+  /auth/session:
+    get:
+      summary: Get session
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Session data
+
+  /documents:
+    get:
+      summary: List documents
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Document list
+
+  /documents/upload:
+    post:
+      summary: Upload document
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+      responses:
+        '201':
+          description: Document uploaded
+
+  /chat/stream:
+    post:
+      summary: Stream chat response
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversationId:
+                  type: string
+                message:
+                  type: string
+      responses:
+        '200':
+          description: SSE stream
+
+  /search:
+    post:
+      summary: Web search
+      tags: [Search]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+      responses:
+        '200':
+          description: Search results
+
+  /tools:
+    get:
+      summary: List available tools
+      tags: [Tools]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tool list
+
+  /tools/execute:
+    post:
+      summary: Execute a tool
+      tags: [Tools]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                arguments:
+                  type: object
+      responses:
+        '200':
+          description: Tool result
+
+  /agents:
+    get:
+      summary: List agents
+      tags: [Agents]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Agent list
+
+  /memory:
+    post:
+      summary: Add memory entry
+      tags: [Memory]
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Memory created
+
+  /knowledge:
+    get:
+      summary: List knowledge bases
+      tags: [Knowledge]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Knowledge base list
+
+  /workflows:
+    get:
+      summary: List workflows
+      tags: [Workflows]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Workflow list
+
+  /teams/organizations:
+    get:
+      summary: List organizations
+      tags: [Teams]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Organization list
+
+  /billing/plans:
+    get:
+      summary: List billing plans
+      tags: [Billing]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Plan list
+
+  /analytics/usage:
+    get:
+      summary: Get usage analytics
+      tags: [Analytics]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usage stats
+
+  /embeddings/search:
+    post:
+      summary: Vector search
+      tags: [Embeddings]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Search results

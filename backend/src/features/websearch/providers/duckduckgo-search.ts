@@ -1,6 +1,16 @@
 import { BaseSearchProvider } from './base-search';
 import { SearchOptions, SearchResult } from '../types';
 
+interface DuckDuckGoResponse {
+  Heading?: string;
+  AbstractText?: string;
+  AbstractURL?: string;
+  RelatedTopics?: Array<{
+    Text?: string;
+    FirstURL?: string;
+  }>;
+}
+
 export class DuckDuckGoSearchProvider extends BaseSearchProvider {
   readonly name = 'duckduckgo';
 
@@ -11,7 +21,7 @@ export class DuckDuckGoSearchProvider extends BaseSearchProvider {
       const response = await fetch(
         `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`
       );
-      const data = await response.json();
+      const data = (await response.json()) as DuckDuckGoResponse;
 
       const results: SearchResult[] = [];
 

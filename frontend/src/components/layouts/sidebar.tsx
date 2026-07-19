@@ -7,11 +7,11 @@ import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Items', href: '/dashboard/items', icon: Package },
-  { name: 'Chat', href: '/dashboard/chat', icon: MessageSquareText },
-  { name: 'Documents', href: '/dashboard/documents', icon: FileText },
-  { name: 'Recommendations', href: '/dashboard/recommendations', icon: Sparkles },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Items', href: '/items', icon: Package },
+  { name: 'Chat', href: '/chat', icon: MessageSquareText },
+  { name: 'Documents', href: '/documents', icon: FileText },
+  { name: 'Recommendations', href: '/recommendations', icon: Sparkles },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export function Sidebar() {

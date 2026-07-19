@@ -24,7 +24,7 @@ export function ConversationSidebar() {
   const conversations = data?.data.data || [];
 
   const handleNewChat = () => {
-    router.push('/dashboard/chat');
+    router.push('/chat');
   };
 
   return (
@@ -48,10 +48,10 @@ export function ConversationSidebar() {
         {conversations.map((conv) => (
           <div key={conv._id} className="relative group">
             <Link
-              href={`/dashboard/chat/${conv._id}`}
+              href={`/chat/${conv._id}`}
               className={cn(
                 'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors',
-                pathname === `/dashboard/chat/${conv._id}`
+                pathname === `/chat/${conv._id}`
                   ? 'bg-accent text-accent-foreground'
                   : 'text-muted-foreground hover:bg-accent/50'
               )}

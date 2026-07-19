@@ -1,10 +1,4 @@
-import type { Metadata } from 'next';
-import './globals.css';
-
-export const metadata: Metadata = {
-  title: 'Babnunur',
-  description: 'AI Productivity Platform',
-};
+import { ThemeProvider } from '@/components/theme-provider';
 
 export default function RootLayout({
   children,
@@ -12,8 +6,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

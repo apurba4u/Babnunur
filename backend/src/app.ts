@@ -12,6 +12,7 @@ import dashboardRoutes from './features/dashboard/routes/dashboard.routes';
 import chatRoutes from './features/chat/routes/chat.routes';
 import conversationRoutes from './features/chat/routes/conversation.routes';
 import documentRoutes from './features/documents/routes/document.routes';
+import embeddingRoutes from './features/embeddings/routes/embedding.routes';
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/conversations', conversationRoutes);
 app.use('/api/v1/documents', documentRoutes);
+app.use('/api/v1/embeddings', embeddingRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

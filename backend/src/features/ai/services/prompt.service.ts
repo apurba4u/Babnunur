@@ -1,9 +1,10 @@
 import { promptEngine } from '../prompts/engine';
 import { promptRegistry } from '../prompts/registry';
-import { PromptContext, PromptAnalytics } from '../prompts/types';
+import { PromptContext, PromptAnalytics, PromptTemplate, ValidationResult } from '../prompts/types';
+import { RenderedPrompt } from '../prompts/types';
 
 export class PromptService {
-  renderPrompt(templateId: string, context: PromptContext, provider: string) {
+  renderPrompt(templateId: string, context: PromptContext, provider: string): { rendered: RenderedPrompt; analytics: PromptAnalytics } {
     const rendered = promptEngine.renderForProvider(templateId, context, provider);
     const template = promptRegistry.get(templateId);
 
@@ -19,22 +20,22 @@ export class PromptService {
     return { rendered, analytics };
   }
 
-  getTemplates(category?: string) {
+  getTemplates(category?: string): PromptTemplate[] {
     if (category) {
       return promptRegistry.listByCategory(category);
     }
     return promptRegistry.list();
   }
 
-  getTemplate(id: string) {
+  getTemplate(id: string): PromptTemplate | undefined {
     return promptRegistry.get(id);
   }
 
-  getCategories() {
+  getCategories(): string[] {
     return promptRegistry.getAllCategories();
   }
 
-  validatePrompt(templateId: string, context: PromptContext) {
+  validatePrompt(templateId: string, context: PromptContext): ValidationResult {
     const template = promptRegistry.get(templateId);
     if (!template) {
       return { valid: false, errors: [`Template '${templateId}' not found`], warnings: [] };

@@ -5,7 +5,7 @@ import { searchService } from '../../websearch/services/search.service';
 import { ProviderFactory } from '../../ai/providers/factory';
 
 export class WorkflowService {
-  async create(userId: string, data: { name: string; description?: string; steps: any[] }) {
+  async create(userId: string, data: { name: string; description?: string; steps: Record<string, unknown>[] }) {
     return WorkflowModel.create({ userId, ...data });
   }
   async list(userId: string) {

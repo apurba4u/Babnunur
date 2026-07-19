@@ -27,3 +27,9 @@ export interface Citation {
   content: string;
   score: number;
 }
+
+export interface RAGChatResponse {
+  response: string;
+  citations: Citation[];
+  tokenUsage: { input: number; output: number; total: number };
+}

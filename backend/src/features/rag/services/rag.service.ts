@@ -1,11 +1,11 @@
 import { contextRetriever } from './context-retriever';
 import { ProviderFactory } from '../../ai/providers/factory';
 import { ChatMessage, ChatChunk } from '../../ai/types';
-import { RAGContext, Citation } from '../types';
+import { RAGContext, Citation, RAGChatResponse } from '../types';
 import { Document } from '../../documents/models/document.model';
 
 export class RAGService {
-  async chatWithDocuments(context: RAGContext, userId: string, history: ChatMessage[] = []) {
+  async chatWithDocuments(context: RAGContext, userId: string, history: ChatMessage[] = []): Promise<RAGChatResponse> {
     const ragResult = await contextRetriever.retrieve(context, userId);
 
     const docIds = [...new Set(context.documentIds || [])];

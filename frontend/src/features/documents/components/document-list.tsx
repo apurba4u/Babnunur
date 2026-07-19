@@ -56,6 +56,7 @@ export function DocumentList() {
             variant="ghost"
             onClick={() => deleteDocument.mutate(doc._id)}
             disabled={deleteDocument.isPending}
+            aria-label={`Delete ${doc.title}`}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

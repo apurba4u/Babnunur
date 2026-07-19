@@ -42,11 +42,11 @@ export function ChatInput({ onSend, onStop, isStreaming, disabled }: ChatInputPr
         className="flex-1"
       />
       {isStreaming ? (
-        <Button variant="destructive" onClick={onStop} size="icon">
+        <Button variant="destructive" onClick={onStop} size="icon" aria-label="Stop streaming">
           <Square className="h-4 w-4" />
         </Button>
       ) : (
-        <Button onClick={handleSubmit} disabled={!input.trim() || disabled} size="icon">
+        <Button onClick={handleSubmit} disabled={!input.trim() || disabled} size="icon" aria-label="Send message">
           <Send className="h-4 w-4" />
         </Button>
       )}

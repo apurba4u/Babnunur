@@ -22,8 +22,8 @@ export function ItemsList({ items, onEdit, onDelete }: ItemsListProps) {
             <div className="flex items-start justify-between">
               <CardTitle className="text-lg">{item.title}</CardTitle>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => onEdit(item)}><Pencil className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => onDelete(item._id)}><Trash2 className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => onEdit(item)} aria-label={`Edit ${item.title}`}><Pencil className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => onDelete(item._id)} aria-label={`Delete ${item.title}`}><Trash2 className="h-4 w-4" /></Button>
               </div>
             </div>
           </CardHeader>

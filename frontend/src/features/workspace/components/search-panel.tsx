@@ -34,7 +34,7 @@ export function SearchPanel() {
             placeholder="Search documents..."
             disabled={isSearching}
           />
-          <Button onClick={handleSearch} disabled={!query.trim() || isSearching} size="icon">
+          <Button onClick={handleSearch} disabled={!query.trim() || isSearching} size="icon" aria-label="Search documents">
             <Search className="h-4 w-4" />
           </Button>
         </div>

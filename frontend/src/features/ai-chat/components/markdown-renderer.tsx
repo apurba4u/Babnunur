@@ -26,6 +26,7 @@ function CodeBlock({ language, children }: { language: string; children: string 
         <button
           onClick={handleCopy}
           className="text-zinc-400 hover:text-white transition-colors"
+          aria-label={copied ? 'Copied code' : 'Copy code'}
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </button>

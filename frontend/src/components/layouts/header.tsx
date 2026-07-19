@@ -16,7 +16,7 @@ export function Header() {
       <div />
       <div className="flex items-center gap-4">
         <ThemeToggle />
-        <Button variant="ghost" size="icon" onClick={handleLogout}>
+        <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
           <LogOut className="h-5 w-5" />
         </Button>
       </div>

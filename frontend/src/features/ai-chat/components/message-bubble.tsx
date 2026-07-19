@@ -34,12 +34,12 @@ export const MessageBubble = memo(function MessageBubble({ message, isPartial, o
         {isPartial && <span className="animate-pulse">|</span>}
         <div className="mt-2 flex items-center gap-2">
           {!isUser && onCopy && message.content && (
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onCopy(message.content)}>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onCopy(message.content)} aria-label="Copy message">
               <Copy className="h-3 w-3" />
             </Button>
           )}
           {!isUser && onRegenerate && !isPartial && !isError && (
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onRegenerate}>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onRegenerate} aria-label="Regenerate response">
               <RefreshCw className="h-3 w-3" />
             </Button>
           )}

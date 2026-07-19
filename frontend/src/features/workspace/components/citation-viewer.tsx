@@ -43,6 +43,7 @@ export function CitationViewer({ citations }: CitationViewerProps) {
             <button
               onClick={() => toggleExpand(citation._id)}
               className="w-full flex items-center gap-3 p-3 text-left hover:bg-accent/50 transition-colors"
+              aria-expanded={isExpanded}
             >
               <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
               <div className="flex-1 min-w-0">

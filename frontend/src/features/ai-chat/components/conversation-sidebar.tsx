@@ -66,6 +66,9 @@ export function ConversationSidebar() {
                 variant="ghost"
                 size="icon"
                 className="h-6 w-6"
+                aria-label="More options"
+                aria-haspopup="true"
+                aria-expanded={openMenu === conv._id}
                 onClick={(e) => {
                   e.preventDefault();
                   setOpenMenu(openMenu === conv._id ? null : conv._id);
@@ -75,21 +78,24 @@ export function ConversationSidebar() {
               </Button>
             </div>
             {openMenu === conv._id && (
-              <div className="absolute right-0 top-full z-10 bg-popover border rounded-md shadow-md py-1 w-32">
+              <div className="absolute right-0 top-full z-10 bg-popover border rounded-md shadow-md py-1 w-32" role="menu" aria-label="Conversation options">
                 <button
                   className="w-full px-3 py-1.5 text-sm text-left hover:bg-accent flex items-center gap-2"
+                  role="menuitem"
                   onClick={() => { favoriteConversation.mutate(conv._id); setOpenMenu(null); }}
                 >
                   <Star className="h-3 w-3" /> {conv.favorite ? 'Unfavorite' : 'Favorite'}
                 </button>
                 <button
                   className="w-full px-3 py-1.5 text-sm text-left hover:bg-accent flex items-center gap-2"
+                  role="menuitem"
                   onClick={() => { pinConversation.mutate(conv._id); setOpenMenu(null); }}
                 >
                   <Pin className="h-3 w-3" /> {conv.pinned ? 'Unpin' : 'Pin'}
                 </button>
                 <button
                   className="w-full px-3 py-1.5 text-sm text-left hover:bg-accent flex items-center gap-2"
+                  role="menuitem"
                   onClick={() => { deleteConversation.mutate(conv._id); setOpenMenu(null); }}
                 >
                   <Trash2 className="h-3 w-3" /> Delete

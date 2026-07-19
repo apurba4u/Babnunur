@@ -50,15 +50,19 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
   return (
     <div className="space-y-4">
       <div
+        role="button"
+        tabIndex={0}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
         className={cn(
           'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
           dragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
         )}
+        aria-label="Upload documents by clicking or dragging files"
       >
         <input
           ref={fileInputRef}
@@ -97,7 +101,7 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
                 'Upload'
               )}
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setSelectedFile(null)}>
+            <Button size="sm" variant="ghost" onClick={() => setSelectedFile(null)} aria-label="Remove selected file">
               <X className="h-4 w-4" />
             </Button>
           </div>

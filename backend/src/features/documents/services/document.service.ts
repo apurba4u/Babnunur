@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Document, DocumentModel } from '../models/document.model';
 import { ProcessingJob } from '../models/job.model';
-import { parserService } from './parser.service';
+import { processDocumentFile } from './process-document';
 import { chunkService } from './chunk.service';
 import { NotFoundError } from '../../../core/errors';
 
@@ -33,26 +33,24 @@ export class DocumentService {
       startedAt: new Date(),
     });
 
-    this.processDocument(doc._id.toString(), userId, storagePath, file.mimetype, job._id.toString());
+    // Process asynchronously with error isolation
+    this.processDocumentSafe(doc._id.toString(), userId, storagePath, file.mimetype, job._id.toString());
 
     return doc;
   }
 
-  private async processDocument(documentId: string, userId: string, storagePath: string, mimeType: string, jobId: string): Promise<void> {
+  private async processDocumentSafe(documentId: string, userId: string, storagePath: string, mimeType: string, jobId: string): Promise<void> {
     try {
-      const buffer = await fs.readFile(storagePath);
-      const parsed = await parserService.parse(buffer, mimeType);
-
-      await Document.findByIdAndUpdate(documentId, {
-        status: 'ready',
-        chunkCount: 0,
-        metadata: parsed.metadata,
-      });
+      const parsed = await processDocumentFile(storagePath, mimeType);
 
       const chunks = chunkService.chunkText(parsed.text);
       await chunkService.saveChunks(documentId, userId, chunks);
 
-      await Document.findByIdAndUpdate(documentId, { chunkCount: chunks.length });
+      await Document.findByIdAndUpdate(documentId, {
+        status: 'ready',
+        chunkCount: chunks.length,
+        metadata: parsed.metadata,
+      });
 
       await ProcessingJob.findByIdAndUpdate(jobId, {
         status: 'completed',
@@ -60,15 +58,10 @@ export class DocumentService {
         completedAt: new Date(),
       });
     } catch (error) {
-      await Document.findByIdAndUpdate(documentId, {
-        status: 'failed',
-        error: (error as Error).message,
-      });
-      await ProcessingJob.findByIdAndUpdate(jobId, {
-        status: 'failed',
-        error: (error as Error).message,
-        completedAt: new Date(),
-      });
+      const errorMessage = error instanceof Error ? error.message : 'Processing failed';
+      console.error(`Document processing failed for ${documentId}:`, errorMessage);
+      await Document.findByIdAndUpdate(documentId, { status: 'failed', error: errorMessage }).catch(() => {});
+      await ProcessingJob.findByIdAndUpdate(jobId, { status: 'failed', error: errorMessage, completedAt: new Date() }).catch(() => {});
     }
   }
 

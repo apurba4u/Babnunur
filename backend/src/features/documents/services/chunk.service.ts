@@ -14,26 +14,40 @@ export class ChunkService {
   chunkText(text: string, options: ChunkOptions = {}): Array<{ content: string; startIndex: number; endIndex: number }> {
     const { chunkSize = DEFAULT_OPTIONS.chunkSize!, chunkOverlap = DEFAULT_OPTIONS.chunkOverlap! } = options;
     const chunks: Array<{ content: string; startIndex: number; endIndex: number }> = [];
+
+    if (text.length === 0) return chunks;
+
+    // If text fits in one chunk, return it as-is
+    if (text.length <= chunkSize) {
+      chunks.push({ content: text.trim(), startIndex: 0, endIndex: text.length });
+      return chunks;
+    }
+
     let startIndex = 0;
 
     while (startIndex < text.length) {
-      const endIndex = Math.min(startIndex + chunkSize, text.length);
-      let chunkEnd = endIndex;
+      let endIndex = Math.min(startIndex + chunkSize, text.length);
 
+      // Try to break at a newline if possible
       if (endIndex < text.length) {
         const lastNewline = text.lastIndexOf('\n', endIndex);
         if (lastNewline > startIndex + chunkSize * 0.5) {
-          chunkEnd = lastNewline + 1;
+          endIndex = lastNewline + 1;
         }
       }
 
-      const content = text.slice(startIndex, chunkEnd).trim();
+      const content = text.slice(startIndex, endIndex).trim();
       if (content.length > 0) {
-        chunks.push({ content, startIndex, endIndex: chunkEnd });
+        chunks.push({ content, startIndex, endIndex });
       }
 
-      startIndex = chunkEnd - chunkOverlap;
-      if (startIndex >= text.length) break;
+      // Advance: if we reached the end, stop; otherwise advance by chunkSize minus overlap
+      if (endIndex >= text.length) break;
+      startIndex = endIndex - Math.min(chunkOverlap, chunkSize / 2);
+      // Safety: always advance by at least 1 character
+      if (startIndex <= chunks[chunks.length - 1]?.startIndex) {
+        startIndex = endIndex;
+      }
     }
 
     return chunks;

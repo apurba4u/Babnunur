@@ -28,7 +28,7 @@ describe('Tool Executor', () => {
   it('should execute calculator', async () => {
     const result = await toolExecutor.execute({ id: '1', name: 'calculator', arguments: { expression: '2+2' } }, 'test-user');
     expect(result.success).toBe(true);
-    expect((result.data as any).result).toBe(4);
+    expect((result.data as { result: number }).result).toBe(4);
   });
 
   it('should execute datetime', async () => {

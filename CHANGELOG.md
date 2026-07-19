@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.0.1] - 2026-07-19
+
+### Added
+- Persistent session management
+- Automated test suite (14 unit tests)
+- OpenAPI documentation with Swagger UI
+- Memory cache abstraction
+- Search result caching
+- Security headers middleware
+- Request metrics tracking
+
+### Improved
+- PDF processing robustness
+- Session persistence across server restarts
+- Code quality (ESLint clean)
+
+### Fixed
+- Duplicate Mongoose email index
+- In-memory session storage replaced with database-backed sessions
+
 ## [3.0.0] - 2026-07-19
 
 ### Added

@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/components/theme-provider';
+import { QueryProvider } from '@/providers/query-provider';
 
 export default function RootLayout({
   children,
@@ -14,7 +15,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>
     </html>

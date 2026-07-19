@@ -53,7 +53,7 @@ export class ChunkService {
     await Chunk.insertMany(docs);
   }
 
-  async getChunksByDocument(documentId: string, userId: string) {
+  async getChunksByDocument(documentId: string, userId: string): Promise<ReturnType<typeof Chunk.find>> {
     return Chunk.find({ documentId, userId }).sort({ chunkIndex: 1 });
   }
 

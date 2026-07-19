@@ -72,7 +72,7 @@ export class DocumentService {
     }
   }
 
-  async list(userId: string, params: { page: number; limit: number; search?: string }) {
+  async list(userId: string, params: { page: number; limit: number; search?: string }): Promise<{ data: Record<string, unknown>[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     const { page, limit, search } = params;
     const filter: Record<string, unknown> = { userId, deletedAt: { $exists: false } };
     if (search) filter.title = { $regex: search, $options: 'i' };
@@ -101,7 +101,7 @@ export class DocumentService {
     await Document.findByIdAndUpdate(id, { deletedAt: new Date() });
   }
 
-  async getJobStatus(documentId: string) {
+  async getJobStatus(documentId: string): Promise<ReturnType<typeof ProcessingJob.findOne>> {
     return ProcessingJob.findOne({ documentId }).sort({ createdAt: -1 });
   }
 }

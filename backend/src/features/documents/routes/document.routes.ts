@@ -43,28 +43,28 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
 
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const doc = await documentService.getById(req.params.id, req.user!.id);
+    const doc = await documentService.getById(req.params.id as string, req.user!.id);
     res.json({ success: true, data: doc });
   } catch (err) { next(err); }
 });
 
 router.get('/:id/chunks', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const chunks = await chunkService.getChunksByDocument(req.params.id, req.user!.id);
+    const chunks = await chunkService.getChunksByDocument(req.params.id as string, req.user!.id);
     res.json({ success: true, data: chunks });
   } catch (err) { next(err); }
 });
 
 router.get('/:id/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const job = await documentService.getJobStatus(req.params.id);
+    const job = await documentService.getJobStatus(req.params.id as string);
     res.json({ success: true, data: job });
   } catch (err) { next(err); }
 });
 
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await documentService.delete(req.params.id, req.user!.id);
+    await documentService.delete(req.params.id as string, req.user!.id);
     res.json({ success: true, message: 'Document deleted' });
   } catch (err) { next(err); }
 });

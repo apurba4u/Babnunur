@@ -22,6 +22,7 @@ import toolRoutes from './features/tools/routes/tool.routes';
 import agentRoutes from './features/agent/routes/agent.routes';
 import agentsRoutes from './features/agents/routes/agent.routes';
 import memoryRoutes from './features/memory/routes/memory.routes';
+import knowledgeBaseRoutes from './features/knowledge/routes/knowledge-base.routes';
 
 const app = express();
 
@@ -104,6 +105,7 @@ app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/tools', toolRoutes);
 app.use('/api/v1/agent', agentRoutes);
 app.use('/api/v1/memory', memoryRoutes);
+app.use('/api/v1/knowledge', knowledgeBaseRoutes);
 app.use('/api/v1/agents', agentsRoutes);
 
 app.use(notFound);

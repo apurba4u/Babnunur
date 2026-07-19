@@ -11,6 +11,7 @@ import itemRoutes from './features/items/routes/item.routes';
 import dashboardRoutes from './features/dashboard/routes/dashboard.routes';
 import chatRoutes from './features/chat/routes/chat.routes';
 import conversationRoutes from './features/chat/routes/conversation.routes';
+import documentRoutes from './features/documents/routes/document.routes';
 
 const app = express();
 
@@ -31,11 +32,47 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Mount Better Auth at its default path
+app.all('/api/auth/*', async (req, res) => {
+  try {
+    const url = new URL(req.originalUrl, `http://${req.headers.host || 'localhost'}`);
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : value);
+    }
+
+    const init: RequestInit = {
+      method: req.method,
+      headers,
+    };
+
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      init.body = JSON.stringify(req.body);
+    }
+
+    const webRequest = new globalThis.Request(url.toString(), init);
+    const { auth } = await import('./config/auth');
+    const webResponse = await auth.handler(webRequest);
+
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => {
+      res.setHeader(key, value);
+    });
+
+    const body = await webResponse.text();
+    res.send(body);
+  } catch (error) {
+    console.error('Auth handler error:', error);
+    res.status(500).json({ success: false, error: 'Auth handler error' });
+  }
+});
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/items', itemRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/chat', chatRoutes);
 app.use('/api/v1/conversations', conversationRoutes);
+app.use('/api/v1/documents', documentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

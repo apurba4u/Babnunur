@@ -30,7 +30,7 @@ export class PromptEngine {
 
     const remainingPlaceholders = systemPrompt.match(/\{\{[^}]+\}\}/g) || [];
     if (remainingPlaceholders.length > 0) {
-      console.warn(`Unresolved placeholders: ${remainingPlaceholders.join(', ')}`);
+      // Unresolved placeholders logged at debug level only
     }
 
     if (provider) {

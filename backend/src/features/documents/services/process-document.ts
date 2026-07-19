@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import mammoth from 'mammoth';
+import { extractText, getMeta } from 'unpdf';
 
 interface ProcessResult {
   text: string;
@@ -14,14 +15,27 @@ export async function processDocumentFile(
 
   switch (mimeType) {
     case 'application/pdf': {
-      // PDF parsing requires additional setup - read as text fallback
-      const text = buffer.toString('utf-8');
-      if (text.includes('%PDF')) {
-        throw new Error('PDF parsing requires additional configuration. Please upload as TXT or DOCX instead.');
+      const uint8 = new Uint8Array(buffer);
+      const [textResult, metaResult] = await Promise.all([
+        extractText(uint8),
+        getMeta(uint8).catch(() => null),
+      ]);
+
+      const text = Array.isArray(textResult.text)
+        ? textResult.text.join('\n')
+        : String(textResult.text || '');
+
+      if (!text.trim()) {
+        throw new Error('Could not extract text from PDF. The document may be image-based or encrypted.');
       }
+
       return {
         text,
-        metadata: { wordCount: text.split(/\s+/).length, charCount: text.length },
+        metadata: {
+          pages: textResult.totalPages || metaResult?.info?.PDFFormatVersion ? 1 : undefined,
+          wordCount: text.split(/\s+/).length,
+          charCount: text.length,
+        },
       };
     }
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {

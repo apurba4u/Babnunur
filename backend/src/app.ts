@@ -15,6 +15,7 @@ import documentRoutes from './features/documents/routes/document.routes';
 import embeddingRoutes from './features/embeddings/routes/embedding.routes';
 import ragRoutes from './features/rag/routes/rag.routes';
 import searchRoutes from './features/websearch/routes/search.routes';
+import toolRoutes from './features/tools/routes/tool.routes';
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use('/api/v1/documents', documentRoutes);
 app.use('/api/v1/embeddings', embeddingRoutes);
 app.use('/api/v1/rag', ragRoutes);
 app.use('/api/v1/search', searchRoutes);
+app.use('/api/v1/tools', toolRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

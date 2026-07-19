@@ -13,8 +13,9 @@ export function useChat(conversationId: string | null) {
 
   // Load messages when conversation changes
   useState(() => {
-    if (conversationData?.data?.messages) {
-      setMessages(conversationData.data.messages);
+    const conversation = conversationData?.data?.data;
+    if (conversation?.messages) {
+      setMessages(conversation.messages);
     }
   });
 
@@ -63,7 +64,7 @@ export function useChat(conversationId: string | null) {
   }, [conversationId, messages.length, createConversation, stream]);
 
   return {
-    conversation: conversationData?.data,
+    conversation: conversationData?.data?.data,
     messages,
     setMessages,
     isStreaming: stream.isStreaming,

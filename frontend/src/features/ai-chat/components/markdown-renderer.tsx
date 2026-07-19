@@ -44,30 +44,31 @@ function CodeBlock({ language, children }: { language: string; children: string 
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <ReactMarkdown
-      className="prose prose-sm dark:prose-invert max-w-none"
-      components={{
-        code({ className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || '');
-          const isInline = !match && !String(children).includes('\n');
+    <div className="prose prose-sm dark:prose-invert max-w-none">
+      <ReactMarkdown
+        components={{
+          code({ className, children, ...props }) {
+            const match = /language-(\w+)/.exec(className || '');
+            const isInline = !match && !String(children).includes('\n');
 
-          if (isInline) {
+            if (isInline) {
+              return (
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
+                  {children}
+                </code>
+              );
+            }
+
             return (
-              <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props}>
-                {children}
-              </code>
+              <CodeBlock language={match?.[1] || ''}>
+                {String(children).replace(/\n$/, '')}
+              </CodeBlock>
             );
-          }
-
-          return (
-            <CodeBlock language={match?.[1] || ''}>
-              {String(children).replace(/\n$/, '')}
-            </CodeBlock>
-          );
-        },
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }

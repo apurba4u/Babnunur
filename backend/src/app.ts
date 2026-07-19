@@ -23,6 +23,8 @@ import agentRoutes from './features/agent/routes/agent.routes';
 import agentsRoutes from './features/agents/routes/agent.routes';
 import memoryRoutes from './features/memory/routes/memory.routes';
 import knowledgeBaseRoutes from './features/knowledge/routes/knowledge-base.routes';
+import workflowRoutes from './features/workflows/routes/workflow.routes';
+import pluginRoutes from './features/plugins/routes/plugin.routes';
 
 const app = express();
 
@@ -107,6 +109,7 @@ app.use('/api/v1/agent', agentRoutes);
 app.use('/api/v1/memory', memoryRoutes);
 app.use('/api/v1/knowledge', knowledgeBaseRoutes);
 app.use('/api/v1/agents', agentsRoutes);
+app.use('/api/v1/workflows', workflowRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

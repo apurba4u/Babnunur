@@ -1,10 +1,9 @@
 import { config } from '../../config';
 
 export const aiConfig = {
-  defaultProvider: 'gemini' as const,
+  defaultProvider: 'opencodezen' as const,
   defaultModel: {
-    gemini: 'gemini-2.0-flash',
-    deepseek: 'deepseek-chat',
+    opencodezen: 'deepseek-v4-flash',
   },
   requestTimeout: Number(config.AI_REQUEST_TIMEOUT),
   maxTokens: Number(config.AI_MAX_TOKENS),

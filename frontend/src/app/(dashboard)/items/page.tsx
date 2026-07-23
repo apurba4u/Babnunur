@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ListSkeleton } from '@/components/ui/skeleton';
 import { ItemsToolbar } from '@/features/items/components/items-toolbar';
 import { ItemsList } from '@/features/items/components/items-list';
 import { ItemForm } from '@/features/items/components/item-form';
@@ -29,7 +30,7 @@ export default function ItemsPage() {
         <ItemForm item={editingItem} onSubmit={editingItem ? handleUpdate : handleCreate} onCancel={() => { setShowForm(false); setEditingItem(null); }} isLoading={createItem.isPending || updateItem.isPending} />
       )}
       {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading...</div>
+        <ListSkeleton items={5} />
       ) : (
         <ItemsList items={data?.data.data || []} onEdit={(item) => { setEditingItem(item); setShowForm(false); }} onDelete={handleDelete} />
       )}

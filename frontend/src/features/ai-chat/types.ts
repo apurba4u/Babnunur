@@ -13,6 +13,13 @@ export interface Conversation {
   updatedAt: string;
 }
 
+export interface Attachment {
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 export interface Message {
   _id: string;
   conversationId: string;
@@ -29,6 +36,7 @@ export interface Message {
   outputTokens: number;
   totalTokens: number;
   latencyMs: number;
+  attachments?: Attachment[];
   createdAt: string;
   updatedAt: string;
 }
@@ -40,6 +48,7 @@ export interface ChatRequest {
   model?: string;
   temperature?: number;
   maxTokens?: number;
+  attachments?: Attachment[];
 }
 
 export interface StreamEvent {

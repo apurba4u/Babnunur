@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build:vercel",
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "functions": {
+    "api/index.ts": {
+      "memory": 512,
+      "maxDuration": 60
+    }
+  }
+}

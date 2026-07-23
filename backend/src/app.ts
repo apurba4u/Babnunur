@@ -32,14 +32,28 @@ import workflowRoutes from './features/workflows/routes/workflow.routes';
 import pluginRoutes from './features/plugins/routes/plugin.routes';
 import billingRoutes from './features/billing/routes/billing.routes';
 import analyticsRoutes from './features/analytics/routes/analytics.routes';
+import stripeRoutes from './features/stripe/routes/stripe.routes';
+import userRoutes from './features/users/routes/user.routes';
+import recommendationRoutes from './features/recommendations/routes/recommendation.routes';
+import couponRoutes from './features/coupons/routes/coupon.routes';
+import adminRoutes from './features/admin/routes/admin.routes';
 
 const app = express();
 
 app.use(helmet());
 app.use(securityHeaders);
 app.use(compression());
-app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
-app.use(express.json({ limit: `${config.MAX_UPLOAD_SIZE}mb` }));
+app.use(cors({
+  origin: config.CORS_ORIGIN.split(',').map(o => o.trim()),
+  credentials: true,
+}));
+
+app.use(express.json({
+  limit: `${config.MAX_UPLOAD_SIZE}mb`,
+  verify: (req, _res, buf) => {
+    if (buf?.length) (req as unknown as { rawBody: string }).rawBody = buf.toString();
+  },
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(requestLogger);
@@ -51,8 +65,10 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// Uploads are handled via memory storage — no local uploads directory
+
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.1.0' });
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '3.1.0' });
 });
 
 app.get('/ready', async (_req, res) => {
@@ -68,6 +84,15 @@ app.get('/ready', async (_req, res) => {
   }
 });
 
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'Babnunur API',
+    version: '3.1.0',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 try {
   const swaggerDocument = YAML.load(path.join(__dirname, 'docs/openapi.yaml'));
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -81,8 +106,9 @@ app.all('/api/auth/*', async (req, res) => {
     const url = new URL(req.originalUrl, `http://${req.headers.host || 'localhost'}`);
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
-      if (value) headers.set(key, Array.isArray(value) ? value[0] : value);
+      if (value && key !== 'origin' && key !== 'referer') headers.set(key, Array.isArray(value) ? value[0] : value);
     }
+    headers.set('origin', `http://${req.headers.host || 'localhost'}`);
 
     const init: RequestInit = {
       method: req.method,
@@ -93,12 +119,11 @@ app.all('/api/auth/*', async (req, res) => {
       init.body = JSON.stringify(req.body);
     }
 
-    const webRequest = new globalThis.Request(url.toString(), init);
-    const { auth } = await import('./config/auth');
-    const webResponse = await auth.handler(webRequest);
+    const { getAuth } = await import('./config/auth');
+    const webResponse = await (await getAuth()).handler(new globalThis.Request(url.toString(), init));
 
     res.status(webResponse.status);
-    webResponse.headers.forEach((value, key) => {
+    webResponse.headers.forEach((value: string, key: string) => {
       res.setHeader(key, value);
     });
 
@@ -129,6 +154,11 @@ app.use('/api/v1/workflows', workflowRoutes);
 app.use('/api/v1/plugins', pluginRoutes);
 app.use('/api/v1/billing', billingRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/stripe', stripeRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/recommendations', recommendationRoutes);
+app.use('/api/v1/coupons', couponRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

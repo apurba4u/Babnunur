@@ -19,22 +19,27 @@ export function useStream() {
     setIsStreaming(true);
     setPartialMessage('');
     setError(null);
+    let tokenCount = 0;
 
     try {
       for await (const event of chatApi.stream(request)) {
         if (event.type === 'token') {
           const content = event.data.content as string;
+          tokenCount++;
           setPartialMessage((prev) => prev + content);
           onToken?.(content);
         } else if (event.type === 'error') {
+          console.log('15. Stream received: ERROR');
           setError(event.data.message as string);
         } else if (event.type === 'usage') {
           onUsage?.(event.data);
         } else if (event.type === 'done' || event.type === 'message_end') {
+          console.log('15. Stream received: DONE (chunks:', tokenCount, ')');
           onEnd?.();
         }
       }
     } catch (err) {
+      console.log('15. Stream received: ERROR -', (err as Error).message);
       setError((err as Error).message);
     } finally {
       setIsStreaming(false);

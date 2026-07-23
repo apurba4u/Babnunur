@@ -1,0 +1,1 @@
+This is a test plain text file. It contains information about natural language processing, which is a key area of AI research.

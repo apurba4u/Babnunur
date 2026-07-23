@@ -78,8 +78,13 @@ export function RegisterForm() {
     }
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  const handleGoogleSignup = async () => {
+    try {
+      const response = await api.post('/auth/sign-in/social', { provider: 'google', callbackURL: '/dashboard' });
+      window.location.href = response.data.url;
+    } catch {
+      setError('Google sign-up failed. Please try again.');
+    }
   };
 
   return (

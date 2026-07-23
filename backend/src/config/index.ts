@@ -13,6 +13,7 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
   DEEPSEEK_API_KEY: z.string().optional(),
   SMTP_HOST: z.string().optional(),
@@ -28,6 +29,13 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
   RATE_LIMIT_WINDOW: z.string().default('900000'),
   RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  IMGBB_API_KEY: z.string().optional(),
+  OPENCODE_ZEN_API_KEY: z.string().optional(),
+  OPENCODE_ZEN_BASE_URL: z.string().optional(),
+  OPENCODE_ZEN_MODEL: z.string().default('deepseek-v4-flash'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -35,7 +43,7 @@ const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {
   console.error('❌ Invalid environment variables:');
   console.error(parsed.error.flatten().fieldErrors);
-  process.exit(1);
+  throw new Error(`Environment validation failed: ${JSON.stringify(parsed.error.flatten().fieldErrors)}`);
 }
 
 export const config = parsed.data;

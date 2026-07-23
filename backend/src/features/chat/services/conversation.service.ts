@@ -1,6 +1,7 @@
 import { Conversation, ConversationDocument } from '../models/conversation.model';
 import { IConversation } from '../types';
 import { NotFoundError } from '../../../core/errors';
+import { aiConfig } from '../../ai/config';
 
 interface ListParams {
   userId: string;
@@ -61,7 +62,7 @@ export class ConversationService {
       userId: data.userId,
       title: data.title || 'New Conversation',
       provider: data.provider || 'gemini',
-      modelName: data.model || 'gemini-2.0-flash',
+      modelName: data.model || (aiConfig.defaultModel as Record<string, string>)[data.provider || 'gemini'] || 'gemini-2.0-flash',
       systemPrompt: data.systemPrompt,
       settings: data.settings as IConversation['settings'],
     });
@@ -98,8 +99,8 @@ export class ConversationService {
 
   async restore(id: string, userId: string): Promise<ConversationDocument> {
     const conv = await Conversation.findOneAndUpdate(
-      { _id: id, userId, deletedAt: { $exists: true } },
-      { $set: { status: 'active' }, $unset: { deletedAt: '', deletedBy: '' } },
+      { _id: id, userId, status: 'archived' },
+      { $set: { status: 'active' } },
       { new: true }
     );
     if (!conv) throw new NotFoundError('Conversation');

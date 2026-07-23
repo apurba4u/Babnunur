@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.1.0] - 2026-07-19
+
+### Added
+- Release engineering automation (release.sh)
+- Final launch report with deployment verification
+- Production deployment scripts
+
+### Improved
+- Version bumped to 3.1.0 for production release
+- Release process documentation
+
 ## [3.0.1] - 2026-07-19
 
 ### Added

@@ -6,11 +6,11 @@ import { processDocumentFile } from './process-document';
 import { chunkService } from './chunk.service';
 import { NotFoundError } from '../../../core/errors';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
+const UPLOAD_DIR = '/tmp/uploads';
 
 export class DocumentService {
   async upload(userId: string, file: Express.Multer.File, title: string): Promise<DocumentModel> {
-    await fs.mkdir(UPLOAD_DIR, { recursive: true });
+    await fs.mkdir(UPLOAD_DIR, { recursive: true }).catch(() => {});
     const storagePath = path.join(UPLOAD_DIR, `${Date.now()}-${file.originalname}`);
     await fs.writeFile(storagePath, file.buffer);
 

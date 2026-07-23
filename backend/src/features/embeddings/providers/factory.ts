@@ -1,21 +1,23 @@
 import { EmbeddingProvider } from '../types';
 import { OpenAIEmbeddingProvider } from './openai-embedding';
 import { LocalEmbeddingProvider } from './local-embedding';
+import { config } from '../../../config';
 
 export class EmbeddingFactory {
   private static providers = new Map<string, EmbeddingProvider>();
+  private static initialized = false;
 
-  static {
+  static initialize(): void {
+    if (EmbeddingFactory.initialized) return;
+    EmbeddingFactory.initialized = true;
     const dimensions = 384;
     const model = 'text-embedding-3-small';
 
-    // Try OpenAI if key is available
-    const openaiKey = process.env.OPENAI_API_KEY;
+    const openaiKey = config.OPENAI_API_KEY;
     if (openaiKey) {
       EmbeddingFactory.register(new OpenAIEmbeddingProvider({ dimensions, maxBatchSize: 2048, model }, openaiKey));
     }
 
-    // Always register local fallback
     EmbeddingFactory.register(new LocalEmbeddingProvider({ dimensions: 384, maxBatchSize: 1000, model: 'local-hash' }));
   }
 
@@ -24,12 +26,14 @@ export class EmbeddingFactory {
   }
 
   static getProvider(name?: string): EmbeddingProvider {
+    EmbeddingFactory.initialize();
     const provider = name ? EmbeddingFactory.providers.get(name) : EmbeddingFactory.providers.get('local');
     if (!provider) throw new Error(`Embedding provider '${name}' not found`);
     return provider;
   }
 
   static getAvailableProviders(): string[] {
+    EmbeddingFactory.initialize();
     return Array.from(EmbeddingFactory.providers.keys());
   }
 }

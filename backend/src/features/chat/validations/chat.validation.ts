@@ -38,6 +38,13 @@ export const queryConversationSchema = z.object({
   sort: z.enum(['updatedAt', '-updatedAt', 'lastMessageAt', '-lastMessageAt', 'createdAt', '-createdAt']).optional().default('-lastMessageAt'),
 });
 
+const attachmentSchema = z.object({
+  url: z.string(),
+  name: z.string().min(1),
+  type: z.string().min(1),
+  size: z.number().positive(),
+});
+
 export const sendMessageSchema = z.object({
   conversationId: z.string().min(1),
   message: z.string().min(1).max(100000),
@@ -45,16 +52,18 @@ export const sendMessageSchema = z.object({
   model: z.string().optional(),
   temperature: z.number().min(0).max(2).optional(),
   maxTokens: z.number().min(1).max(128000).optional(),
+  attachments: z.array(attachmentSchema).optional(),
 });
 
 export const streamMessageSchema = z.object({
   conversationId: z.string().min(1),
-  message: z.string().min(1).max(100000),
+  message: z.string().max(100000),
   provider: z.string().optional(),
   model: z.string().optional(),
   temperature: z.number().min(0).max(2).optional(),
   maxTokens: z.number().min(1).max(128000).optional(),
   requestId: z.string().optional(),
+  attachments: z.array(attachmentSchema).optional(),
 });
 
 export const messageParamsSchema = z.object({

@@ -2,6 +2,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   messageType?: 'text' | 'markdown' | 'code' | 'image' | 'file' | 'system' | 'tool';
+  images?: string[];
 }
 
 export interface ChatOptions {

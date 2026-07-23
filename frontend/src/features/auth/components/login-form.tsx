@@ -42,8 +42,13 @@ export function LoginForm() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await api.post('/auth/sign-in/social', { provider: 'google', callbackURL: window.location.origin + '/dashboard' });
+      window.location.href = response.data.url;
+    } catch {
+      setError('Google sign-in failed. Please try again.');
+    }
   };
 
   return (

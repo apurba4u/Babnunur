@@ -1,16 +1,33 @@
-import { ChatRequest } from '../types';
+import api from '@/lib/axios';
+import { ChatRequest, Attachment } from '../types';
 
 export const chatApi = {
+  upload: async (files: File[]): Promise<Attachment[]> => {
+    const formData = new FormData();
+    files.forEach((f) => formData.append('files', f));
+    const res = await api.post('/chat/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data.data;
+  },
+
   stream: async function* (request: ChatRequest): AsyncGenerator<{ type: string; data: Record<string, unknown> }> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/stream`, {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/chat/stream`;
+    console.log('2. Request payload:', JSON.stringify(request));
+    console.log('3. API URL:', url);
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify(request),
     });
+    console.log('4. Response status:', response.status, response.statusText);
 
     const reader = response.body?.getReader();
-    if (!reader) return;
+    if (!reader) {
+      console.log('4. Response status: NO READER');
+      return;
+    }
 
     const decoder = new TextDecoder();
     let buffer = '';

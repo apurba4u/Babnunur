@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy, RefreshCw, User, Bot, AlertCircle } from 'lucide-react';
+import { Copy, RefreshCw, User, Bot, AlertCircle, FileText, Image } from 'lucide-react';
 import { MarkdownRenderer } from './markdown-renderer';
 import { Message } from '../types';
 
@@ -27,7 +27,25 @@ export const MessageBubble = memo(function MessageBubble({ message, isPartial, o
       )}
       <Card className={`max-w-[80%] px-4 py-3 ${isUser ? 'bg-primary text-primary-foreground' : ''} ${isError ? 'border-destructive' : ''}`}>
         {isUser ? (
-          <div className="text-sm">{message.content}</div>
+          <div className="text-sm space-y-2">
+            {message.attachments && message.attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {message.attachments.map((att, i) => (
+                  att.type.startsWith('image/') ? (
+                    <div key={i} className="h-20 w-20 rounded-md overflow-hidden border border-primary/20">
+                      <img src={att.url} alt={att.name} className="h-full w-full object-cover" />
+                    </div>
+                  ) : (
+                    <div key={i} className="flex items-center gap-1.5 rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1.5 text-xs">
+                      <FileText className="h-3.5 w-3.5" />
+                      <span className="truncate max-w-[120px]">{att.name}</span>
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
+            {message.content && <p>{message.content}</p>}
+          </div>
         ) : (
           <MarkdownRenderer content={message.content || (isPartial ? '' : '...')} />
         )}

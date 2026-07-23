@@ -36,6 +36,7 @@ export class MessageService {
     messageType?: string;
     parentMessageId?: string;
     status?: string;
+    attachments?: Array<{ url: string; name: string; type: string; size: number }>;
   }): Promise<MessageDocument> {
     const lastMsg = await Message.findOne({ conversationId: data.conversationId })
       .sort({ sequenceNumber: -1 })

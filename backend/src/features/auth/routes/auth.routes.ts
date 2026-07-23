@@ -15,6 +15,11 @@ router.all('*', async (req: Request, res: Response) => {
     const originalPath = req.originalUrl;
     const targetPath = PATH_REWRITES[originalPath] || originalPath;
     const url = new URL(targetPath, `${req.protocol}://${req.headers.host || 'localhost'}`);
+
+    if (originalPath.includes('/callback/')) {
+      console.log('[OAuth Callback] state param:', url.searchParams.get('state')?.slice(0, 20));
+      console.log('[OAuth Callback] cookie:', (req.headers.cookie || '').slice(0, 120));
+    }
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
@@ -23,7 +28,10 @@ router.all('*', async (req: Request, res: Response) => {
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.body && Object.keys(req.body).length > 0) init.body = JSON.stringify(req.body);
     const webResponse = await (await getAuth()).handler(new globalThis.Request(url.toString(), init));
     res.status(webResponse.status);
-    webResponse.headers.forEach((value: string, key: string) => res.setHeader(key, value));
+    webResponse.headers.forEach((value: string, key: string) => {
+      if (key.toLowerCase() === 'set-cookie') res.append(key, value);
+      else res.setHeader(key, value);
+    });
     const body = await webResponse.text();
     if (webResponse.status >= 300 && webResponse.status < 400) {
       const location = webResponse.headers.get('location');

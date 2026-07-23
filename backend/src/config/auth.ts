@@ -21,6 +21,9 @@ export async function getAuth() {
             config.BETTER_AUTH_URL,
           ],
       secret: config.BETTER_AUTH_SECRET,
+      account: {
+        storeStateStrategy: 'cookie',
+      },
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,

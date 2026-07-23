@@ -125,7 +125,8 @@ app.all('/api/auth/*', async (req, res) => {
 
     res.status(webResponse.status);
     webResponse.headers.forEach((value: string, key: string) => {
-      res.setHeader(key, value);
+      if (key.toLowerCase() === 'set-cookie') res.append(key, value);
+      else res.setHeader(key, value);
     });
 
     const body = await webResponse.text();

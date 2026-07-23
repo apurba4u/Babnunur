@@ -14,12 +14,11 @@ router.all('*', async (req: Request, res: Response) => {
   try {
     const originalPath = req.originalUrl;
     const targetPath = PATH_REWRITES[originalPath] || originalPath;
-    const url = new URL(targetPath, `http://${req.headers.host || 'localhost'}`);
+    const url = new URL(targetPath, `${req.protocol}://${req.headers.host || 'localhost'}`);
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
-      if (value && key !== 'origin' && key !== 'referer') headers.set(key, Array.isArray(value) ? value[0] : String(value));
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : String(value));
     }
-    headers.set('origin', `http://${req.headers.host || 'localhost'}`);
     const init: RequestInit = { method: req.method, headers };
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.body && Object.keys(req.body).length > 0) init.body = JSON.stringify(req.body);
     const webResponse = await (await getAuth()).handler(new globalThis.Request(url.toString(), init));

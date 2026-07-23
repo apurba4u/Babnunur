@@ -40,6 +40,8 @@ import adminRoutes from './features/admin/routes/admin.routes';
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(securityHeaders);
 app.use(compression());
@@ -103,12 +105,11 @@ try {
 // Mount Better Auth at its default path
 app.all('/api/auth/*', async (req, res) => {
   try {
-    const url = new URL(req.originalUrl, `http://${req.headers.host || 'localhost'}`);
+    const url = new URL(req.originalUrl, `${req.protocol}://${req.headers.host || 'localhost'}`);
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
-      if (value && key !== 'origin' && key !== 'referer') headers.set(key, Array.isArray(value) ? value[0] : value);
+      if (value) headers.set(key, Array.isArray(value) ? value[0] : value);
     }
-    headers.set('origin', `http://${req.headers.host || 'localhost'}`);
 
     const init: RequestInit = {
       method: req.method,

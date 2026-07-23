@@ -8,3 +8,4 @@ dist/
 .DS_Store
 .vercel
 api/index.js
+.env*

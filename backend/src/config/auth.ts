@@ -16,7 +16,10 @@ export async function getAuth() {
       database: mongodbAdapterModule.mongodbAdapter(db),
       baseURL: `${config.BETTER_AUTH_URL}${AUTH_BASE_PATH}`,
       basePath: AUTH_BASE_PATH,
-      trustedOrigins: config.CORS_ORIGIN.split(',').map(o => o.trim()),
+          trustedOrigins: [
+            ...config.CORS_ORIGIN.split(',').map(o => o.trim()),
+            config.BETTER_AUTH_URL,
+          ],
       secret: config.BETTER_AUTH_SECRET,
       emailAndPassword: {
         enabled: true,
